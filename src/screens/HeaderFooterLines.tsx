@@ -162,7 +162,7 @@ const HeaderFooterLines: FC<Props> = ({ onBack, onDirty }) => {
         style={{
           display: 'flex',
           alignItems: 'center',
-          padding: '10px 16px',
+          padding: '16px 16px',
           background: '#fcfcfc',
           borderBottom: '1px solid #e5e5ea',
           flexShrink: 0,
