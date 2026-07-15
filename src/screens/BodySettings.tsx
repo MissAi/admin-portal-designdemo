@@ -1,5 +1,4 @@
-import { useState, type FC } from 'react'
-import { VegaInputSelect } from '@globalpayments/vega-react'
+import { useRef, useState, type FC } from 'react'
 import StatusBar from '../components/StatusBar'
 
 interface Props {
@@ -7,71 +6,31 @@ interface Props {
   onDirty: () => void
 }
 
-type VegaSelectSourceItem = {
-  id: string
-  displayName: string
-}
-
-const FONT_BODY_OPTIONS: VegaSelectSourceItem[] = [
-  {
-    id: 'Menlo-Bold (iOS)/ RobotoMono-Bold (Android)',
-    displayName: 'Menlo-Bold (iOS)/ RobotoMono-Bold (Android)',
-  },
-  {
-    id: 'Menlo-Regular (iOS)/ RobotoMono-Regular (Android)',
-    displayName: 'Menlo-Regular (iOS)/ RobotoMono-Regular (Android)',
-  },
-  {
-    id: 'Helvetica Neue (iOS)/ Roboto (Android)',
-    displayName: 'Helvetica Neue (iOS)/ Roboto (Android)',
-  },
-  {
-    id: 'San Francisco (iOS)/ Roboto (Android)',
-    displayName: 'San Francisco (iOS)/ Roboto (Android)',
-  },
-  {
-    id: 'Avenir Next (iOS)/ Roboto (Android)',
-    displayName: 'Avenir Next (iOS)/ Roboto (Android)',
-  },
-  {
-    id: 'Courier New (iOS)/ RobotoMono (Android)',
-    displayName: 'Courier New (iOS)/ RobotoMono (Android)',
-  },
-  {
-    id: 'Times New Roman (iOS)/ Noto Serif (Android)',
-    displayName: 'Times New Roman (iOS)/ Noto Serif (Android)',
-  },
-  {
-    id: 'Georgia (iOS)/ Noto Serif (Android)',
-    displayName: 'Georgia (iOS)/ Noto Serif (Android)',
-  },
+const FONT_BODY_OPTIONS = [
+  'Menlo-Bold (iOS)/ RobotoMono-Bold (Android)',
+  'Menlo-Regular (iOS)/ RobotoMono-Regular (Android)',
+  'Helvetica Neue (iOS)/ Roboto (Android)',
+  'San Francisco (iOS)/ Roboto (Android)',
+  'Avenir Next (iOS)/ Roboto (Android)',
+  'Courier New (iOS)/ RobotoMono (Android)',
+  'Times New Roman (iOS)/ Noto Serif (Android)',
+  'Georgia (iOS)/ Noto Serif (Android)',
 ]
 
-const SIZE_OPTIONS: VegaSelectSourceItem[] = [
-  { id: 'Small', displayName: 'Small' },
-  { id: 'Standard', displayName: 'Standard' },
-  { id: 'Large', displayName: 'Large' },
-]
-
-function getVegaSelectValue(event: Event): string | null {
-  const customEvent = event as CustomEvent<unknown>
-  const detail = customEvent.detail
-
-  if (typeof detail === 'string') return detail
-
-  if (detail && typeof detail === 'object' && 'value' in detail) {
-    const value = (detail as { value?: unknown }).value
-    if (typeof value === 'string') return value
-  }
-
-  return null
-}
+const SIZE_OPTIONS = ['Small', 'Standard', 'Large']
 
 const BodySettings: FC<Props> = ({ onBack, onDirty }) => {
   const [fontBody, setFontBody] = useState(
     'Menlo-Bold (iOS)/ RobotoMono-Bold (Android)',
   )
   const [size, setSize] = useState('Small')
+  const hasMarkedDirtyRef = useRef(false)
+
+  const markDirtyOnce = () => {
+    if (hasMarkedDirtyRef.current) return
+    hasMarkedDirtyRef.current = true
+    onDirty()
+  }
 
   return (
     <div
@@ -138,39 +97,71 @@ const BodySettings: FC<Props> = ({ onBack, onDirty }) => {
             gap: 16,
           }}
         >
-          <VegaInputSelect
-            label="Font Body"
-            selectType="single"
-            source={FONT_BODY_OPTIONS}
+          <FieldLabel label="Font Body" />
+          <select
             value={fontBody}
-            vegaDropdownProps={{ searchable: true }}
-            onVegaChange={(event: Event) => {
-              const next = getVegaSelectValue(event)
-              if (next && next !== fontBody) {
+            onChange={(event) => {
+              const next = event.target.value
+              if (next !== fontBody) {
                 setFontBody(next)
-                onDirty()
+                markDirtyOnce()
               }
             }}
-          />
+            style={selectStyle}
+          >
+            {FONT_BODY_OPTIONS.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
 
-          <VegaInputSelect
-            label="Size"
-            selectType="single"
-            source={SIZE_OPTIONS}
+          <FieldLabel label="Size" />
+          <select
             value={size}
-            vegaDropdownProps={{ searchable: false }}
-            onVegaChange={(event: Event) => {
-              const next = getVegaSelectValue(event)
-              if (next && next !== size) {
+            onChange={(event) => {
+              const next = event.target.value
+              if (next !== size) {
                 setSize(next)
-                onDirty()
+                markDirtyOnce()
               }
             }}
-          />
+            style={selectStyle}
+          >
+            {SIZE_OPTIONS.map((option) => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
         </div>
       </div>
     </div>
   )
+}
+
+function FieldLabel({ label }: { label: string }) {
+  return (
+    <div
+      style={{
+        fontSize: 16,
+        color: '#04041C',
+        fontWeight: 500,
+        marginBottom: 8,
+      }}
+    >
+      {label}
+    </div>
+  )
+}
+
+const selectStyle: React.CSSProperties = {
+  width: '100%',
+  height: 44,
+  border: '1px solid #ABC6D8',
+  borderRadius: 8,
+  background: '#FFFFFF',
+  padding: '0 12px',
+  fontSize: 15,
+  color: '#04041C',
+  outline: 'none',
+  fontFamily: 'inherit',
 }
 
 export default BodySettings
