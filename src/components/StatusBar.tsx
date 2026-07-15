@@ -1,9 +1,23 @@
+const MOBILE_BROWSER_UA = /Android|iPhone|iPad|iPod|Mobile|Windows Phone|webOS|BlackBerry/i
+
+function shouldHideMockSystemBarsOnThisDevice() {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+    return false
+  }
+
+  return MOBILE_BROWSER_UA.test(navigator.userAgent)
+}
+
 /* Shared iOS-style status bar */
 export default function StatusBar({
   background = 'transparent',
 }: {
   background?: string
 }) {
+  if (shouldHideMockSystemBarsOnThisDevice()) {
+    return null
+  }
+
   return (
     <div
       style={{

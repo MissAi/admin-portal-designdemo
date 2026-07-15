@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react'
+import { VegaInputNumeric } from '@globalpayments/vega-react'
 import StatusBar from '../components/StatusBar'
 
 interface Props {
@@ -12,6 +13,17 @@ const DisplaySettings: FC<Props> = ({ onBack, onOpenLogoPicker, logoUrl }) => {
   const [rollUpModifiers, setRollUpModifiers] = useState(true)
   const [topMargin, setTopMargin] = useState('1')
   const [bottomMargin, setBottomMargin] = useState('1')
+
+  const handleMarginInput = (setValue: (value: string) => void, event: Event) => {
+    const nextValue = (event as CustomEvent<number>).detail
+
+    if (Number.isNaN(nextValue)) {
+      setValue('')
+      return
+    }
+
+    setValue(String(nextValue))
+  }
 
   return (
     <div
@@ -131,12 +143,28 @@ const DisplaySettings: FC<Props> = ({ onBack, onOpenLogoPicker, logoUrl }) => {
         </div>
 
         {/* Top Margin */}
-        <FieldLabel label="Top Margin" />
-        <SuffixInput value={topMargin} onChange={setTopMargin} suffix="lines" />
+        <VegaInputNumeric
+          label="Top Margin"
+          value={topMargin}
+          integerOnly={true}
+          suffixText="lines"
+          showClearIcon={false}
+          onVegaChange={(event: Event) => {
+            handleMarginInput(setTopMargin, event)
+          }}
+        />
 
         {/* Bottom Margin */}
-        <FieldLabel label="Bottom Margin" />
-        <SuffixInput value={bottomMargin} onChange={setBottomMargin} suffix="lines" />
+        <VegaInputNumeric
+          label="Bottom Margin"
+          value={bottomMargin}
+          integerOnly={true}
+          suffixText="lines"
+          showClearIcon={false}
+          onVegaChange={(event: Event) => {
+            handleMarginInput(setBottomMargin, event)
+          }}
+        />
 
         {/* Checkboxes */}
         <CheckboxField
@@ -226,52 +254,6 @@ const inputStyle: React.CSSProperties = {
   fontFamily: 'inherit',
   outline: 'none',
   background: 'white',
-}
-
-function SuffixInput({
-  value,
-  onChange,
-  suffix,
-}: {
-  value: string
-  onChange: (value: string) => void
-  suffix: string
-}) {
-  return (
-    <div
-      style={{
-        ...inputStyle,
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0 14px',
-      }}
-    >
-      <input
-        value={value}
-        onChange={(event) => {
-          const nextValue = event.target.value.replace(/[^0-9]/g, '')
-          onChange(nextValue)
-        }}
-        inputMode="numeric"
-        aria-label={suffix}
-        style={{
-          width: `${Math.max(value.length, 1)}ch`,
-          border: 'none',
-          outline: 'none',
-          background: 'transparent',
-          padding: '12px 0',
-          fontFamily: 'inherit',
-          fontSize: 16,
-          color: '#04041C',
-          textAlign: 'right',
-          flexShrink: 0,
-        }}
-      />
-      <span style={{ flexShrink: 0, color: '#6B747D', fontSize: 16, marginLeft: 2 }}>
-        {suffix}
-      </span>
-    </div>
-  )
 }
 
 function FieldLabel({ label }: { label: string }) {

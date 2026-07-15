@@ -21,6 +21,7 @@ type Screen =
 export default function CustomerReceiptApp() {
   const [screen, setScreen] = useState<Screen>('left-nav')
   const [saveAllEnabled, setSaveAllEnabled] = useState(false)
+  const [showAuditTrail, setShowAuditTrail] = useState(false)
   const [selectedLogoUrl, setSelectedLogoUrl] = useState<string | null>(null)
 
   return (
@@ -33,6 +34,18 @@ export default function CustomerReceiptApp() {
       {screen === 'receipt-list' && (
         <CustomerReceiptList
           saveAllEnabled={saveAllEnabled}
+          showAuditTrail={showAuditTrail}
+          onSaveAll={() => {
+            setSaveAllEnabled(false)
+            setShowAuditTrail(true)
+          }}
+          onOpenAuditTrail={() => {
+            // Placeholder action for prototype menu interaction.
+          }}
+          onDiscardChanges={() => {
+            setSelectedLogoUrl(null)
+            setSaveAllEnabled(false)
+          }}
           onDisplayClick={() => setScreen('display')}
           onBodyClick={() => setScreen('body')}
           onHeaderFooterClick={() => setScreen('header-footer')}

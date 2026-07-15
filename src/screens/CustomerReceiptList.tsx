@@ -1,8 +1,12 @@
-import type { FC } from 'react'
+import { useEffect, useRef, useState, type FC } from 'react'
 import StatusBar from '../components/StatusBar'
 
 interface Props {
   saveAllEnabled: boolean
+  showAuditTrail: boolean
+  onSaveAll: () => void
+  onOpenAuditTrail: () => void
+  onDiscardChanges: () => void
   onDisplayClick: () => void
   onBodyClick: () => void
   onHeaderFooterClick: () => void
@@ -17,14 +21,39 @@ const ITEMS = [
   { label: 'E-Mail Receipts', tappable: true },
 ]
 
+const ICON_VERSION = '20260715-1710'
+
 const CustomerReceiptList: FC<Props> = ({
   saveAllEnabled,
+  showAuditTrail,
+  onSaveAll,
+  onOpenAuditTrail,
+  onDiscardChanges,
   onDisplayClick,
   onBodyClick,
   onHeaderFooterClick,
   onEmailReceiptsClick,
   onHamburgerClick,
 }) => {
+  const [showActionMenu, setShowActionMenu] = useState(false)
+  const actionMenuRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!showActionMenu) return
+
+    const handleMouseDown = (event: MouseEvent) => {
+      if (!actionMenuRef.current) return
+      if (!actionMenuRef.current.contains(event.target as Node)) {
+        setShowActionMenu(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown)
+    }
+  }, [showActionMenu])
+
   function handleItemClick(label: string) {
     if (label === 'Display') onDisplayClick()
     if (label === 'Body') onBodyClick()
@@ -95,11 +124,6 @@ const CustomerReceiptList: FC<Props> = ({
             alt="Publish"
             style={{ width: 44, height: 44, objectFit: 'contain' }}
           />
-          <img
-            src="/icons/info.svg"
-            alt="Info"
-            style={{ width: 44, height: 44, objectFit: 'contain' }}
-          />
         </div>
       </div>
 
@@ -118,11 +142,113 @@ const CustomerReceiptList: FC<Props> = ({
         <span style={{ fontWeight: 700, fontSize: 18, color: '#04041C' }}>
           Customer Receipt
         </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ color: '#262AFF', fontSize: 18, fontWeight: 800, letterSpacing: 1 }}>
-            ···
-          </span>
+        <div ref={actionMenuRef} style={{ display: 'flex', alignItems: 'center', gap: 12, position: 'relative' }}>
           <button
+            type="button"
+            aria-label="Open receipt actions"
+            onClick={() => setShowActionMenu((prev) => !prev)}
+            style={{
+              border: 'none',
+              background: 'none',
+              color: '#262AFF',
+              fontSize: 18,
+              fontWeight: 800,
+              letterSpacing: 1,
+              cursor: 'pointer',
+              padding: 0,
+              lineHeight: 1,
+            }}
+          >
+            ···
+          </button>
+
+          {showActionMenu && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 8px)',
+                right: 0,
+                minWidth: 190,
+                border: '1px solid #ABC6D8',
+                borderRadius: 8,
+                background: '#FCFCFC',
+                boxShadow: '0 8px 20px rgba(4,4,28,0.12)',
+                overflow: 'hidden',
+                zIndex: 30,
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  if (!saveAllEnabled) return
+                  onDiscardChanges()
+                  setShowActionMenu(false)
+                }}
+                style={{
+                  width: '100%',
+                  border: 'none',
+                  background: '#FCFCFC',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '12px 14px',
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: saveAllEnabled ? '#04041C' : 'rgba(4, 4, 28, 0.48)',
+                  cursor: saveAllEnabled ? 'pointer' : 'not-allowed',
+                  fontFamily: 'inherit',
+                  textAlign: 'left',
+                }}
+              >
+                <img
+                  src={`/icons/discard%20changes.svg?v=${ICON_VERSION}`}
+                  alt="Discard changes"
+                  style={{ width: 16, height: 16, objectFit: 'contain', opacity: saveAllEnabled ? 1 : 0.5 }}
+                />
+                <span>Discard Changes</span>
+              </button>
+
+              {showAuditTrail && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenAuditTrail()
+                    setShowActionMenu(false)
+                  }}
+                  style={{
+                    width: '100%',
+                    border: 'none',
+                    borderTop: '1px solid #ABC6D8',
+                    background: '#FCFCFC',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '12px 14px',
+                    fontSize: 15,
+                    fontWeight: 600,
+                    color: '#04041C',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    textAlign: 'left',
+                  }}
+                >
+                  <img
+                    src={`/icons/audit%20trail.svg?v=${ICON_VERSION}`}
+                    alt="Audit trail"
+                    style={{ width: 16, height: 16, objectFit: 'contain' }}
+                  />
+                  <span>Audit Trail</span>
+                </button>
+              )}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => {
+              if (!saveAllEnabled) return
+              onSaveAll()
+            }}
             style={{
               padding: '8px 16px',
               borderRadius: 20,
@@ -152,34 +278,11 @@ const CustomerReceiptList: FC<Props> = ({
               alignItems: 'center',
               padding: '24px 24px',
               borderBottom:
-                i < ITEMS.length - 1 ? '1px solid #e5e5ea' : 'none',
+                i < ITEMS.length - 1 ? '1px solid #ABC6D8' : 'none',
               cursor: item.tappable ? 'pointer' : 'default',
               background: 'white',
             }}
           >
-            {/* Info circle icon */}
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              style={{ marginRight: 12, flexShrink: 0 }}
-            >
-              <circle
-                cx="10"
-                cy="10"
-                r="8.5"
-                stroke="#262AFF"
-                strokeWidth="1.5"
-              />
-              <path
-                d="M10 9.5v4.5"
-                stroke="#262AFF"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-              <circle cx="10" cy="7" r="0.8" fill="#262AFF" />
-            </svg>
             <span
               style={{
                 flex: 1,
@@ -194,7 +297,8 @@ const CustomerReceiptList: FC<Props> = ({
             <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
               <path
                 d="M2 2l6 6-6 6"
-                stroke="#C7C7CC"
+                stroke="#04041C"
+                opacity="0.64"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"

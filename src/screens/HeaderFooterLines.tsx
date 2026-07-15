@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react'
+import { VegaInput, VegaInputSelect } from '@globalpayments/vega-react'
 import StatusBar from '../components/StatusBar'
 
 interface Line {
@@ -34,6 +35,39 @@ interface EditorState {
 
 const SIZE_OPTIONS = Array.from({ length: 31 }, (_, i) => 12 + i * 2)
 const ALIGNMENT_OPTIONS: Line['alignment'][] = ['Left', 'Center', 'Right']
+const FONT_OPTIONS = [
+  'Helvetica-Bold',
+  'Helvetica-Regular',
+  'Menlo-Bold',
+  'Menlo-Regular',
+]
+
+type VegaSelectSourceItem = {
+  id: string
+  displayName: string
+}
+
+function createSelectSource(options: string[]): VegaSelectSourceItem[] {
+  return options.map((option) => ({ id: option, displayName: option }))
+}
+
+const FONT_SELECT_SOURCE = createSelectSource(FONT_OPTIONS)
+const SIZE_SELECT_SOURCE = createSelectSource(SIZE_OPTIONS.map(String))
+const ALIGNMENT_SELECT_SOURCE = createSelectSource(ALIGNMENT_OPTIONS)
+
+function getVegaSelectValue(event: Event): string | null {
+  const customEvent = event as CustomEvent<unknown>
+  const detail = customEvent.detail
+
+  if (typeof detail === 'string') return detail
+
+  if (detail && typeof detail === 'object' && 'value' in detail) {
+    const value = (detail as { value?: unknown }).value
+    if (typeof value === 'string') return value
+  }
+
+  return null
+}
 
 const HeaderFooterLines: FC<Props> = ({ onBack }) => {
   const [headerLines, setHeaderLines] = useState<Line[]>([DEFAULT_HEADER])
@@ -496,7 +530,6 @@ function EditCard({
   onDone: () => void
   onCancel: () => void
 }) {
-const [isTextFocused, setIsTextFocused] = useState(false)
   return (
     <div
       style={{
@@ -508,29 +541,16 @@ const [isTextFocused, setIsTextFocused] = useState(false)
     >
       {/* Text row */}
       <div style={{ marginBottom: 14 }}>
-        <div style={labelStyle}>Text</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <input
-            autoFocus
-            value={text}
-            onChange={(e) => onTextChange(e.target.value)}
-            onFocus={() => setIsTextFocused(true)}
-            onBlur={() => setIsTextFocused(false)}
-            placeholder=""
-            style={{
-              flex: 1,
-              padding: '10px 12px',
-              border: isTextFocused ? '1px solid #262AFF' : '1px solid #ABC6D8',
-              borderRadius: 6,
-              fontSize: 16,
-              fontFamily: 'inherit',
-              outline: 'none',
-              color: '#04041C',
-              background: 'white',
-              boxShadow: isTextFocused ? '0 0 0 2px rgba(38,42,255,0.25)' : 'none',
-              transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-            }}
-          />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <VegaInput
+              label="Text"
+              value={text}
+              onVegaChange={(event: Event) => {
+                onTextChange((event as CustomEvent<string>).detail ?? '')
+              }}
+            />
+          </div>
           {hasDone ? (
             <button
               onClick={onDone}
@@ -548,38 +568,50 @@ const [isTextFocused, setIsTextFocused] = useState(false)
 
       {/* Font dropdown */}
       <div style={{ marginBottom: 14 }}>
-        <div style={labelStyle}>Font</div>
-        <DropdownRow value={font} />
+        <VegaInputSelect
+          label="Font"
+          selectType="single"
+          source={FONT_SELECT_SOURCE}
+          value={font}
+          vegaDropdownProps={{ searchable: false }}
+          onVegaChange={(event: Event) => {
+            const next = getVegaSelectValue(event)
+            if (next) onTextChange(text)
+          }}
+        />
       </div>
 
       {/* Size dropdown */}
       <div style={{ marginBottom: 14 }}>
-        <div style={labelStyle}>Size</div>
-        <SelectDropdown
+        <VegaInputSelect
+          label="Size"
+          selectType="single"
+          source={SIZE_SELECT_SOURCE}
           value={String(size)}
-          options={SIZE_OPTIONS.map((option) => String(option))}
-          onChange={(next) => onSizeChange(Number(next))}
+          vegaDropdownProps={{ searchable: false }}
+          onVegaChange={(event: Event) => {
+            const next = getVegaSelectValue(event)
+            if (next) onSizeChange(Number(next))
+          }}
         />
       </div>
 
       {/* Alignment dropdown */}
       <div>
-        <div style={labelStyle}>Alignment</div>
-        <SelectDropdown
+        <VegaInputSelect
+          label="Alignment"
+          selectType="single"
+          source={ALIGNMENT_SELECT_SOURCE}
           value={alignment}
-          options={ALIGNMENT_OPTIONS}
-          onChange={(next) => onAlignmentChange(next as Line['alignment'])}
+          vegaDropdownProps={{ searchable: false }}
+          onVegaChange={(event: Event) => {
+            const next = getVegaSelectValue(event)
+            if (next) onAlignmentChange(next as Line['alignment'])
+          }}
         />
       </div>
     </div>
   )
-}
-
-const labelStyle: React.CSSProperties = {
-  fontSize: 14,
-  color: '#6B747D',
-  fontWeight: 500,
-  marginBottom: 6,
 }
 
 function actionBtnStyle(color: string): React.CSSProperties {
@@ -594,127 +626,6 @@ function actionBtnStyle(color: string): React.CSSProperties {
     whiteSpace: 'nowrap',
     fontFamily: 'inherit',
   }
-}
-
-function DropdownRow({ value }: { value: string }) {
-  return (
-    <div
-      style={{
-        padding: '10px 12px',
-        border: '1px solid #ABC6D8',
-        borderRadius: 6,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        background: 'white',
-      }}
-    >
-      <span style={{ fontSize: 16, color: '#04041C' }}>{value}</span>
-       <img
-            src="/icons/dropdown.svg"
-            alt="dropdown"
-            style={{ width: 16, height: 16, objectFit: 'contain' }}
-          />
-    </div>
-  )
-}
-
-function SelectDropdown({
-  value,
-  options,
-  onChange,
-}: {
-  value: string
-  options: string[]
-  onChange: (next: string) => void
-}) {
-  const [isOpen, setIsOpen] = useState(false)
-
-  return (
-    <div style={{ position: 'relative' }}>
-      <button
-        type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
-        style={{
-          width: '100%',
-          padding: '10px 12px',
-          border: isOpen ? '1px solid #262AFF' : '1px solid #ABC6D8',
-          borderRadius: 6,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          background: 'white',
-          color: '#04041C',
-          boxShadow: isOpen ? '0 0 0 2px rgba(38,42,255,0.25)' : 'none',
-          transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-          cursor: 'pointer',
-          fontFamily: 'inherit',
-          fontSize: 16,
-          textAlign: 'left',
-        }}
-      >
-        <span>{value}</span>
-        <img
-          src="/icons/dropdown.svg"
-          alt="dropdown"
-          style={{
-            width: 16,
-            height: 16,
-            objectFit: 'contain',
-            transform: isOpen ? 'rotate(180deg)' : 'none',
-            transition: 'transform 0.15s ease',
-          }}
-        />
-      </button>
-
-      {isOpen && (
-        <div
-          style={{
-            position: 'absolute',
-            top: 'calc(100% + 6px)',
-            left: 0,
-            right: 0,
-            background: 'white',
-            border: '1px solid #ABC6D8',
-            borderRadius: 8,
-            boxShadow: '0 8px 20px rgba(4,4,28,0.12)',
-            zIndex: 20,
-            maxHeight: 240,
-            overflowY: 'auto',
-            padding: '6px 0',
-          }}
-        >
-          {options.map((option) => {
-            const isSelected = option === value
-            return (
-              <button
-                key={option}
-                type="button"
-                onClick={() => {
-                  onChange(option)
-                  setIsOpen(false)
-                }}
-                style={{
-                  width: '100%',
-                  border: 'none',
-                  background: isSelected ? '#F0F3F7' : 'transparent',
-                  color: '#04041C',
-                  fontSize: 16,
-                  padding: '10px 12px',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  fontFamily: 'inherit',
-                  fontWeight: isSelected ? 700 : 500,
-                }}
-              >
-                {option}
-              </button>
-            )
-          })}
-        </div>
-      )}
-    </div>
-  )
 }
 
 export default HeaderFooterLines

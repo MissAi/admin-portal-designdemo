@@ -1,4 +1,5 @@
-import type { FC } from 'react'
+import { useState, type FC } from 'react'
+import { VegaInput, VegaTextarea } from '@globalpayments/vega-react'
 import StatusBar from '../components/StatusBar'
 
 interface Props {
@@ -6,6 +7,9 @@ interface Props {
 }
 
 const EmailReceipts: FC<Props> = ({ onBack }) => {
+  const [emailSubject, setEmailSubject] = useState('')
+  const [emailBodyText, setEmailBodyText] = useState('')
+
   return (
     <div
       style={{
@@ -67,54 +71,37 @@ const EmailReceipts: FC<Props> = ({ onBack }) => {
             background: '#FCFCFC',
             padding: '16px 16px 48px',
             boxShadow: '0 1px 0 rgba(4,4,28,0.04)',
+            display: 'grid',
+            gap: 16,
           }}
         >
-          <FieldGroup label="Email Subject">
-            <input style={inputStyle} defaultValue="" />
-          </FieldGroup>
-          <FieldGroup label="Email Body Text">
-            <textarea style={textareaStyle} defaultValue="" />
-          </FieldGroup>
+          <VegaInput
+            label="Email Subject"
+            value={emailSubject}
+            labelSuffixButtonConfig={{
+              icon: 'fas fa-circle-info',
+              text: 'Displayed as the subject line for receipt emails.',
+              trigger: 'hover',
+              placement: 'top',
+              alignment: 'center',
+            }}
+            onVegaChange={(event: Event) => {
+              setEmailSubject((event as CustomEvent<string>).detail ?? '')
+            }}
+          />
+
+          <VegaTextarea
+            label="Email Body Text"
+            value={emailBodyText}
+            rows={6}
+            onVegaChange={(event: Event) => {
+              setEmailBodyText((event as CustomEvent<string>).detail ?? '')
+            }}
+          />
         </div>
       </div>
     </div>
   )
-}
-
-function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div style={{ marginBottom: 16 }}>
-      <div style={labelStyle}>{label}</div>
-      {children}
-    </div>
-  )
-}
-
-const labelStyle: React.CSSProperties = {
-  fontSize: 16,
-  fontWeight: 500,
-  color: '#04041C',
-  marginBottom: 8,
-}
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  minHeight: 40,
-  padding: '0 12px',
-  border: '1px solid #ABC6D8',
-  borderRadius: 8,
-  background: '#FCFCFC',
-  fontFamily: 'inherit',
-  fontSize: 16,
-  color: '#04041C',
-  outline: 'none',
-}
-
-const textareaStyle: React.CSSProperties = {
-  ...inputStyle,
-  minHeight: 120,
-  padding: '10px 12px',
-  resize: 'none',
 }
 
 export default EmailReceipts

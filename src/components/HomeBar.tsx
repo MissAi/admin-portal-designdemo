@@ -1,4 +1,18 @@
+const MOBILE_BROWSER_UA = /Android|iPhone|iPad|iPod|Mobile|Windows Phone|webOS|BlackBerry/i
+
+function shouldHideMockSystemBarsOnThisDevice() {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+    return false
+  }
+
+  return MOBILE_BROWSER_UA.test(navigator.userAgent)
+}
+
 export default function HomeBar() {
+  if (shouldHideMockSystemBarsOnThisDevice()) {
+    return null
+  }
+
   return (
     <div
       aria-hidden="true"
