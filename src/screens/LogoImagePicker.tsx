@@ -42,9 +42,11 @@ const LogoImagePicker: FC<Props> = ({ onBack, onConfirm }) => {
 
       <div
         style={{
-          display: 'flex',
+          display: 'grid',
+          gridTemplateColumns: '83px 1fr 83px',
           alignItems: 'center',
           padding: '10px 16px',
+          columnGap: 8,
           background: '#FCFCFC',
           borderBottom: '1px solid #e5e5ea',
           flexShrink: 0,
@@ -63,7 +65,8 @@ const LogoImagePicker: FC<Props> = ({ onBack, onConfirm }) => {
             display: 'flex',
             alignItems: 'center',
             gap: 4,
-            minWidth: 60,
+            width: '100%',
+            textAlign: 'left',
           }}
         >
           Back
@@ -75,11 +78,27 @@ const LogoImagePicker: FC<Props> = ({ onBack, onConfirm }) => {
             fontWeight: 700,
             fontSize: 18,
             color: '#04041C',
-            marginRight: 60,
           }}
         >
           Select Logo
         </span>
+        <button
+          onClick={() => selectedLogo && onConfirm(selectedLogo)}
+          disabled={!canConfirm}
+          style={{
+            border: 'none',
+            background: 'none',
+            color: canConfirm ? '#262AFF' : '#9FA8B2',
+            fontSize: 16,
+            fontWeight: 700,
+            cursor: canConfirm ? 'pointer' : 'default',
+            padding: 0,
+            width: '100%',
+            textAlign: 'right',
+          }}
+        >
+          Confirm
+        </button>
       </div>
 
       <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
@@ -176,32 +195,6 @@ const LogoImagePicker: FC<Props> = ({ onBack, onConfirm }) => {
             </div>
           )}
         </div>
-      </div>
-
-      <div
-        style={{
-          padding: 16,
-          background: '#FCFCFC',
-          borderTop: '1px solid #e5e5ea',
-        }}
-      >
-        <button
-          onClick={() => selectedLogo && onConfirm(selectedLogo)}
-          disabled={!canConfirm}
-          style={{
-            width: '100%',
-            minHeight: 44,
-            border: 'none',
-            borderRadius: 10,
-            background: canConfirm ? '#262AFF' : '#B7C4F8',
-            color: '#FFFFFF',
-            fontWeight: 700,
-            fontSize: 16,
-            cursor: canConfirm ? 'pointer' : 'default',
-          }}
-        >
-          Confirm
-        </button>
       </div>
     </div>
   )
