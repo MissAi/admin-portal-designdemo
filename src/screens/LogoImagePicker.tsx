@@ -271,19 +271,12 @@ const LogoImagePicker: FC<Props> = ({ onBack, onConfirm }) => {
                       justifyContent: 'center',
                     }}
                   >
-                    <svg width="22" height="22" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                      <path d="M2.8 4.2H13.2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-                      <path d="M6.2 2.8H9.8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-                      <path
-                        d="M4.4 4.2V12.5C4.4 13.1 4.9 13.6 5.5 13.6H10.5C11.1 13.6 11.6 13.1 11.6 12.5V4.2"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path d="M6.8 6.8V11.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      <path d="M9.2 6.8V11.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    </svg>
+                    <img
+                      src={`${BASE_URL}icons/delete.svg`}
+                      alt=""
+                      aria-hidden="true"
+                      style={{ width: 22, height: 22, objectFit: 'contain' }}
+                    />
                   </button>
                 </div>
               </div>
