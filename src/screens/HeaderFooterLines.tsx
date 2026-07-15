@@ -543,10 +543,16 @@ function EditCard({
   onCancel: () => void
 }) {
   const textInputRef = useRef<HTMLVegaInputElement | null>(null)
+  const [formReady, setFormReady] = useState(false)
 
   useEffect(() => {
-    void textInputRef.current?.doFocus?.()
+    const id = window.setTimeout(() => setFormReady(true), 240)
+    return () => window.clearTimeout(id)
   }, [])
+
+  useEffect(() => {
+    if (formReady) void textInputRef.current?.doFocus?.()
+  }, [formReady])
 
   return (
     <div
@@ -561,6 +567,9 @@ function EditCard({
       <div style={{ marginBottom: 14 }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
+            {!formReady ? (
+              <div style={{ height: 52, borderRadius: 8, background: '#eaeef2' }} />
+            ) : (
             <VegaInput
               ref={textInputRef}
               label="Text"
@@ -570,6 +579,7 @@ function EditCard({
                 onTextChange((event as CustomEvent<string>).detail ?? '')
               }}
             />
+            )}
           </div>
           <div style={{ height: 48, display: 'flex', alignItems: 'center' }}>
             {hasDone ? (
@@ -590,6 +600,9 @@ function EditCard({
 
       {/* Font dropdown */}
       <div style={{ marginBottom: 14 }}>
+        {!formReady ? (
+          <div style={{ height: 52, borderRadius: 8, background: '#eaeef2' }} />
+        ) : (
         <VegaInputSelect
           label="Font"
           selectType="single"
@@ -601,10 +614,14 @@ function EditCard({
             if (next) onFontChange(next)
           }}
         />
+        )}
       </div>
 
       {/* Size dropdown */}
       <div style={{ marginBottom: 14 }}>
+        {!formReady ? (
+          <div style={{ height: 52, borderRadius: 8, background: '#eaeef2' }} />
+        ) : (
         <VegaInputSelect
           label="Size"
           selectType="single"
@@ -616,10 +633,14 @@ function EditCard({
             if (next) onSizeChange(Number(next))
           }}
         />
+        )}
       </div>
 
       {/* Alignment dropdown */}
       <div>
+        {!formReady ? (
+          <div style={{ height: 52, borderRadius: 8, background: '#eaeef2' }} />
+        ) : (
         <VegaInputSelect
           label="Alignment"
           selectType="single"
@@ -631,6 +652,7 @@ function EditCard({
             if (next) onAlignmentChange(next as Line['alignment'])
           }}
         />
+        )}
       </div>
     </div>
   )

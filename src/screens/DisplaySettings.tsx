@@ -1,4 +1,5 @@
-import { useRef, useState, type FC } from 'react'
+import { useEffect, useRef, useState, type FC } from 'react'
+import { VegaInputNumeric } from '@globalpayments/vega-react'
 import StatusBar from '../components/StatusBar'
 
 interface Props {
@@ -15,6 +16,12 @@ const DisplaySettings: FC<Props> = ({ onBack, onOpenLogoPicker, onResetLogo, onD
   const [topMargin, setTopMargin] = useState('1')
   const [bottomMargin, setBottomMargin] = useState('1')
   const hasMarkedDirtyRef = useRef(false)
+  const [formReady, setFormReady] = useState(false)
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setFormReady(true), 240)
+    return () => window.clearTimeout(id)
+  }, [])
 
   const handleMarginInput = (
     currentValue: string,
@@ -199,22 +206,30 @@ const DisplaySettings: FC<Props> = ({ onBack, onOpenLogoPicker, onResetLogo, onD
         )}
 
         {/* Top Margin */}
-        <NumericLinesField
-          label="Top Margin"
-          value={topMargin}
-          onChange={(nextValue) => {
-            handleMarginInput(topMargin, setTopMargin, nextValue)
-          }}
-        />
+        {formReady ? (
+          <NumericLinesField
+            label="Top Margin"
+            value={topMargin}
+            onChange={(nextValue) => {
+              handleMarginInput(topMargin, setTopMargin, nextValue)
+            }}
+          />
+        ) : (
+          <FieldSkeleton />
+        )}
 
         {/* Bottom Margin */}
-        <NumericLinesField
-          label="Bottom Margin"
-          value={bottomMargin}
-          onChange={(nextValue) => {
-            handleMarginInput(bottomMargin, setBottomMargin, nextValue)
-          }}
-        />
+        {formReady ? (
+          <NumericLinesField
+            label="Bottom Margin"
+            value={bottomMargin}
+            onChange={(nextValue) => {
+              handleMarginInput(bottomMargin, setBottomMargin, nextValue)
+            }}
+          />
+        ) : (
+          <FieldSkeleton />
+        )}
 
         {/* Checkboxes */}
         <CheckboxField
@@ -297,6 +312,10 @@ const DisplaySettings: FC<Props> = ({ onBack, onOpenLogoPicker, onResetLogo, onD
   )
 }
 
+function FieldSkeleton() {
+  return <div style={{ height: 52, borderRadius: 8, background: '#F0F3F7', marginBottom: 16 }} />
+}
+
 function NumericLinesField({
   label,
   value,
@@ -307,38 +326,29 @@ function NumericLinesField({
   onChange: (nextValue: string) => void
 }) {
   return (
-    <div style={{ marginBottom: 16 }}>
-      <FieldLabel label={label} />
-      <div
-        style={{
-          ...inputStyle,
-          marginBottom: 0,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-        }}
-      >
-        <input
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          placeholder="0"
-          style={{
-            border: 'none',
-            outline: 'none',
-            background: 'transparent',
-            flex: 1,
-            minWidth: 0,
-            fontSize: 16,
-            color: '#04041C',
-            fontFamily: 'inherit',
-          }}
-        />
-        <span style={{ color: '#6B747D', fontSize: 14 }}>lines</span>
-      </div>
-    </div>
+    <VegaInputNumeric
+      label={label}
+      value={value}
+      integerOnly={true}
+      suffixText="lines"
+      showClearIcon={false}
+      style={{ marginBottom: 16 }}
+      onVegaChange={(event: Event) => {
+        const target = event.currentTarget as { value?: unknown }
+        if (typeof target.value === 'string') {
+          onChange(target.value)
+          return
+        }
+
+        const detail = (event as CustomEvent<number>).detail
+        if (Number.isNaN(detail)) {
+          onChange('')
+          return
+        }
+
+        onChange(String(detail))
+      }}
+    />
   )
 }
 

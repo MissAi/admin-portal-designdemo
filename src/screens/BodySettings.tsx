@@ -1,4 +1,5 @@
-import { useRef, useState, type FC } from 'react'
+import { useEffect, useRef, useState, type FC } from 'react'
+import { VegaInputSelect } from '@globalpayments/vega-react'
 import StatusBar from '../components/StatusBar'
 
 interface Props {
@@ -19,12 +20,57 @@ const FONT_BODY_OPTIONS = [
 
 const SIZE_OPTIONS = ['Small', 'Standard', 'Large']
 
+type VegaSelectSourceItem = {
+  id: string
+  displayName: string
+}
+
+function toFontDisplayName(option: string): string {
+  return option
+    .replace(' (iOS)', '')
+    .replace(' (Android)', '')
+    .replace('/ ', '/ ')
+}
+
+function createSelectSource(
+  options: string[],
+  formatter?: (option: string) => string,
+): VegaSelectSourceItem[] {
+  return options.map((option) => ({
+    id: option,
+    displayName: formatter ? formatter(option) : option,
+  }))
+}
+
+const FONT_BODY_SOURCE = createSelectSource(FONT_BODY_OPTIONS, toFontDisplayName)
+const SIZE_SOURCE = createSelectSource(SIZE_OPTIONS)
+
+function getVegaSelectValue(event: Event): string | null {
+  const customEvent = event as CustomEvent<unknown>
+  const detail = customEvent.detail
+
+  if (typeof detail === 'string') return detail
+
+  if (detail && typeof detail === 'object' && 'value' in detail) {
+    const value = (detail as { value?: unknown }).value
+    if (typeof value === 'string') return value
+  }
+
+  return null
+}
+
 const BodySettings: FC<Props> = ({ onBack, onDirty }) => {
   const [fontBody, setFontBody] = useState(
     'Menlo-Bold (iOS)/ RobotoMono-Bold (Android)',
   )
   const [size, setSize] = useState('Small')
   const hasMarkedDirtyRef = useRef(false)
+  const [formReady, setFormReady] = useState(false)
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setFormReady(true), 240)
+    return () => window.clearTimeout(id)
+  }, [])
 
   const markDirtyOnce = () => {
     if (hasMarkedDirtyRef.current) return
@@ -97,41 +143,61 @@ const BodySettings: FC<Props> = ({ onBack, onDirty }) => {
             gap: 16,
           }}
         >
-          <FieldLabel label="Font Body" />
-          <select
-            value={fontBody}
-            onChange={(event) => {
-              const next = event.target.value
-              if (next !== fontBody) {
-                setFontBody(next)
-                markDirtyOnce()
-              }
-            }}
-            style={selectStyle}
-          >
-            {FONT_BODY_OPTIONS.map((option) => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
+          {!formReady ? (
+            <FieldSkeleton rows={2} />
+          ) : (<>
+          <div>
+            <FieldLabel label="Font Body" />
+            <VegaInputSelect
+              label=""
+              selectType="single"
+              source={FONT_BODY_SOURCE}
+              value={fontBody}
+              vegaDropdownProps={{ searchable: true }}
+              selectedLabelTooltipProps={{ maxWidth: 0 }}
+              dropdownItemTooltipProps={{ maxWidth: 0 }}
+              onVegaChange={(event: Event) => {
+                const next = getVegaSelectValue(event)
+                if (next && next !== fontBody) {
+                  setFontBody(next)
+                  markDirtyOnce()
+                }
+              }}
+            />
+          </div>
 
-          <FieldLabel label="Size" />
-          <select
-            value={size}
-            onChange={(event) => {
-              const next = event.target.value
-              if (next !== size) {
-                setSize(next)
-                markDirtyOnce()
-              }
-            }}
-            style={selectStyle}
-          >
-            {SIZE_OPTIONS.map((option) => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
+          <div>
+            <FieldLabel label="Size" />
+            <VegaInputSelect
+              label=""
+              selectType="single"
+              source={SIZE_SOURCE}
+              value={size}
+              vegaDropdownProps={{ searchable: false }}
+              selectedLabelTooltipProps={{ maxWidth: 0 }}
+              dropdownItemTooltipProps={{ maxWidth: 0 }}
+              onVegaChange={(event: Event) => {
+                const next = getVegaSelectValue(event)
+                if (next && next !== size) {
+                  setSize(next)
+                  markDirtyOnce()
+                }
+              }}
+            />
+          </div>
+          </>)}
         </div>
       </div>
+    </div>
+  )
+}
+
+function FieldSkeleton({ rows }: { rows: number }) {
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} style={{ height: 52, borderRadius: 8, background: '#F0F3F7' }} />
+      ))}
     </div>
   )
 }
@@ -143,25 +209,12 @@ function FieldLabel({ label }: { label: string }) {
         fontSize: 16,
         color: '#04041C',
         fontWeight: 500,
-        marginBottom: 8,
+        marginBottom: 6,
       }}
     >
       {label}
     </div>
   )
-}
-
-const selectStyle: React.CSSProperties = {
-  width: '100%',
-  height: 44,
-  border: '1px solid #ABC6D8',
-  borderRadius: 8,
-  background: '#FFFFFF',
-  padding: '0 12px',
-  fontSize: 15,
-  color: '#04041C',
-  outline: 'none',
-  fontFamily: 'inherit',
 }
 
 export default BodySettings

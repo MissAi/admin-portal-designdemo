@@ -1,4 +1,5 @@
-import { useRef, useState, type FC } from 'react'
+import { useEffect, useRef, useState, type FC } from 'react'
+import { VegaInput, VegaTextarea } from '@globalpayments/vega-react'
 import StatusBar from '../components/StatusBar'
 
 interface Props {
@@ -10,6 +11,12 @@ const EmailReceipts: FC<Props> = ({ onBack, onDirty }) => {
   const [emailSubject, setEmailSubject] = useState('')
   const [emailBodyText, setEmailBodyText] = useState('')
   const hasMarkedDirtyRef = useRef(false)
+  const [formReady, setFormReady] = useState(false)
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setFormReady(true), 240)
+    return () => window.clearTimeout(id)
+  }, [])
 
   const markDirtyOnce = () => {
     if (hasMarkedDirtyRef.current) return
@@ -82,94 +89,55 @@ const EmailReceipts: FC<Props> = ({ onBack, onDirty }) => {
             gap: 16,
           }}
         >
-          <FieldLabel
+          {!formReady ? (
+            <FieldSkeleton rows={2} />
+          ) : (<>
+          <VegaInput
             label="Email Subject"
-            helper="Displayed as the subject line for receipt emails."
-          />
-          <input
             value={emailSubject}
-            onChange={(event) => {
-              const next = event.target.value
+            labelSuffixButtonConfig={{
+              icon: 'fas fa-circle-info',
+              text: 'Displayed as the subject line for receipt emails.',
+              trigger: 'hover',
+              placement: 'top',
+              alignment: 'center',
+            }}
+            onVegaChange={(event: Event) => {
+              const next = (event as CustomEvent<string>).detail ?? ''
               if (next !== emailSubject) {
                 setEmailSubject(next)
                 markDirtyOnce()
               }
             }}
-            style={inputStyle}
           />
 
-          <FieldLabel label="Email Body Text" />
-          <textarea
+          <VegaTextarea
+            label="Email Body Text"
             value={emailBodyText}
             rows={6}
-            onChange={(event) => {
-              const next = event.target.value
+            onVegaChange={(event: Event) => {
+              const next = (event as CustomEvent<string>).detail ?? ''
               if (next !== emailBodyText) {
                 setEmailBodyText(next)
                 markDirtyOnce()
               }
             }}
-            style={textareaStyle}
           />
+          </>)}
         </div>
       </div>
     </div>
   )
 }
 
-function FieldLabel({
-  label,
-  helper,
-}: {
-  label: string
-  helper?: string
-}) {
+function FieldSkeleton({ rows }: { rows: number }) {
   return (
-    <div style={{ display: 'grid', gap: 6 }}>
-      <div
-        style={{
-          fontSize: 16,
-          color: '#04041C',
-          fontWeight: 500,
-        }}
-      >
-        {label}
-      </div>
-      {helper && (
-        <div style={{ fontSize: 13, lineHeight: 1.4, color: '#6B747D' }}>
-          {helper}
-        </div>
-      )}
+    <div style={{ display: 'grid', gap: 16 }}>
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} style={{ height: 52, borderRadius: 8, background: '#F0F3F7' }} />
+      ))}
     </div>
   )
-}
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  height: 44,
-  border: '1px solid #ABC6D8',
-  borderRadius: 8,
-  background: '#FFFFFF',
-  padding: '0 12px',
-  fontSize: 15,
-  color: '#04041C',
-  outline: 'none',
-  fontFamily: 'inherit',
-}
-
-const textareaStyle: React.CSSProperties = {
-  width: '100%',
-  minHeight: 132,
-  border: '1px solid #ABC6D8',
-  borderRadius: 8,
-  background: '#FFFFFF',
-  padding: '12px',
-  fontSize: 15,
-  lineHeight: 1.5,
-  color: '#04041C',
-  outline: 'none',
-  resize: 'vertical',
-  fontFamily: 'inherit',
 }
 
 export default EmailReceipts
