@@ -1,0 +1,454 @@
+/*
+ * Desktop-only demo: not wrapped in .phone-shell, follows the real browser
+ * viewport width. #root/body are overridden (scoped via :has) only while
+ * this page is mounted, so the mobile Customer Receipt flow is unaffected.
+ */
+#root:has(> .rbd-page) {
+  display: block;
+  padding: 0;
+  min-height: 100vh;
+}
+
+body:has(.rbd-page) {
+  background: #eef1f4;
+}
+
+.rbd-page {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  color: #04041c;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ---------- Top header ---------- */
+.rbd-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e3e6ea;
+}
+
+.rbd-header__left,
+.rbd-header__right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.rbd-header__brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.rbd-header__brand-name {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.rbd-header__brand-sub {
+  font-size: 12px;
+  color: #6b747d;
+}
+
+.rbd-header__location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid #d5dae0;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #262aff;
+  white-space: nowrap;
+}
+
+.rbd-header__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: #3b4859;
+  cursor: pointer;
+}
+
+.rbd-header__icon-btn:hover {
+  background: #f0f3f7;
+}
+
+.rbd-header__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #fbd066;
+  color: #04041c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ---------- Body layout: left nav + main content ---------- */
+.rbd-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.rbd-leftnav {
+  width: 220px;
+  flex-shrink: 0;
+  background: #ffffff;
+  border-right: 1px solid #e3e6ea;
+  overflow-y: auto;
+}
+
+.rbd-leftnav ul {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0;
+}
+
+.rbd-leftnav li {
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #3b4859;
+  cursor: pointer;
+}
+
+.rbd-leftnav li.is-active {
+  background: #eef0ff;
+  color: #262aff;
+  font-weight: 700;
+  border-right: 3px solid #262aff;
+}
+
+.rbd-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: #eef1f4;
+  overflow-y: auto;
+}
+
+/* ---------- Toolbar ---------- */
+.rbd-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rbd-toolbar__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rbd-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.rbd-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid #d5dae0;
+  background: #ffffff;
+  color: #262aff;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.rbd-back-btn:hover {
+  background: #f0f3f7;
+}
+
+.rbd-item-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #04041c;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rbd-save-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 9px 22px;
+  background: #262aff;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rbd-save-btn:hover {
+  background: #1c1fd1;
+}
+
+/* ---------- Action group: responsive states ---------- */
+.rbd-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Default (<=1024px): collapsed dropdown only */
+.rbd-actions__collapsed {
+  display: flex;
+}
+
+.rbd-actions__icons,
+.rbd-actions__labels {
+  display: none;
+}
+
+/* 1025px - 1599px: icon-only buttons */
+@media (min-width: 1025px) {
+  .rbd-actions__collapsed {
+    display: none;
+  }
+
+  .rbd-actions__icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+/* >=1600px: full labeled buttons */
+@media (min-width: 1600px) {
+  .rbd-actions__icons {
+    display: none;
+  }
+
+  .rbd-actions__labels {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.rbd-icon-btn,
+.rbd-label-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #d5dae0;
+  background: #ffffff;
+  color: #3b4859;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rbd-icon-btn {
+  width: 36px;
+  height: 36px;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0;
+}
+
+.rbd-label-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rbd-icon-btn:hover,
+.rbd-label-btn:hover {
+  background: #f0f3f7;
+}
+
+.rbd-icon-btn--danger,
+.rbd-label-btn--danger {
+  color: #d3232f;
+  border-color: #f2c8cb;
+}
+
+.rbd-icon-btn--danger:hover,
+.rbd-label-btn--danger:hover {
+  background: #fdf1f1;
+}
+
+/* ---------- Collapsed "Actions" dropdown (<=1024px / iPad-like) ---------- */
+.rbd-actions-dropdown {
+  position: relative;
+}
+
+.rbd-actions-dropdown__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid #262aff;
+  background: #ffffff;
+  color: #262aff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rbd-actions-dropdown__trigger:hover {
+  background: #eef0ff;
+}
+
+.rbd-actions-dropdown__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  min-width: 220px;
+  background: #ffffff;
+  border: 1px solid #e3e6ea;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(4, 4, 28, 0.16);
+  padding: 6px 0;
+}
+
+.rbd-actions-dropdown__group {
+  padding: 4px 0;
+}
+
+.rbd-actions-dropdown__group:not(:last-child) {
+  border-bottom: 1px solid #eceef1;
+}
+
+.rbd-actions-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 16px;
+  border: none;
+  background: none;
+  color: #3b4859;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rbd-actions-dropdown__item:hover {
+  background: #f0f3f7;
+}
+
+.rbd-actions-dropdown__item--danger {
+  color: #d3232f;
+}
+
+/* ---------- White surface + fixed-width form container ---------- */
+.rbd-surface {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 2px rgba(4, 4, 28, 0.05);
+}
+
+.rbd-form {
+  width: 1008px;
+  max-width: 100%;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rbd-row--photo {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.rbd-photo-placeholder {
+  flex-shrink: 0;
+  width: 96px;
+  height: 96px;
+  border-radius: 10px;
+  border: 1px solid #d5dae0;
+  background: #f5f7fa;
+  color: #6b747d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.rbd-row--stack {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rbd-row--quad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.rbd-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rbd-toggle__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #04041c;
+}
+
+.rbd-toggle__box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #d5dae0;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #3b4859;
+  cursor: pointer;
+}
+
+.rbd-toggle__box input {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: #262aff;
+}

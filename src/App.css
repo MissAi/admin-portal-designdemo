@@ -33,40 +33,54 @@ body {
 
 .screen-motion {
   height: 100%;
-  animation-duration: 220ms;
-  animation-fill-mode: both;
-  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
-  will-change: transform, opacity;
+}
+
+.left-nav-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(59, 72, 89, 0.35) transparent;
+}
+
+.left-nav-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.left-nav-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.left-nav-scroll::-webkit-scrollbar-thumb {
+  background: rgba(59, 72, 89, 0.35);
+  border-radius: 999px;
+}
+
+.left-nav-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 72, 89, 0.5);
 }
 
 .screen-motion--page {
-  animation-name: screen-enter-page;
+  animation: screen-enter-page 220ms ease;
 }
 
 .screen-motion--drawer {
-  animation-name: screen-enter-drawer;
-}
-
-.save-success-toast {
-  animation: save-toast-enter 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation: screen-enter-drawer 260ms ease;
 }
 
 @keyframes screen-enter-page {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.996);
+    transform: translateY(8px);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
 @keyframes screen-enter-drawer {
   from {
     opacity: 0;
-    transform: translateX(-14px);
+    transform: translateX(-18px);
   }
 
   to {
@@ -75,25 +89,10 @@ body {
   }
 }
 
-@keyframes save-toast-enter {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.98);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .screen-motion {
-    animation-duration: 1ms;
-  }
-
-  .save-success-toast {
-    animation-duration: 1ms;
+  .screen-motion--page,
+  .screen-motion--drawer {
+    animation: none;
   }
 }
 
