@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState, type FC } from 'react'
 import {
+  VegaButton,
   VegaInput,
   VegaInputNumeric,
   VegaInputSelect,
   VegaTextarea,
 } from '@globalpayments/vega-react'
 import './ResponsiveButtonsDemo.css'
+
+const ICON_BASE = `${import.meta.env.BASE_URL}icons/`
 
 type VegaSelectSourceItem = {
   id: string
@@ -66,6 +69,7 @@ type IconName =
   | 'copy'
   | 'plus'
   | 'chevron-down'
+  | 'map-pin'
   | 'clock'
   | 'menu'
   | 'help-circle'
@@ -138,6 +142,13 @@ function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
           <polyline points="6 9 12 15 18 9" />
         </svg>
       )
+    case 'map-pin':
+      return (
+        <svg {...common}>
+          <path d="M12 21s-6-5.33-6-11a6 6 0 1 1 12 0c0 5.67-6 11-6 11Z" />
+          <circle cx="12" cy="10" r="2.5" />
+        </svg>
+      )
     case 'clock':
       return (
         <svg {...common}>
@@ -185,21 +196,28 @@ function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
 interface ActionDef {
   key: string
   icon: IconName
+  iconSrc?: string
   label: string
   dropdownLabel?: string
   danger?: boolean
 }
 
 const TOOLBAR_ACTIONS: ActionDef[] = [
-  { key: 'discard', icon: 'rotate-ccw', label: 'Discard Changes' },
+  {
+    key: 'discard',
+    icon: 'rotate-ccw',
+    iconSrc: `${ICON_BASE}discard_blue.svg`,
+    label: 'Discard Changes',
+  },
   {
     key: 'location-overrides',
     icon: 'server',
+    iconSrc: `${ICON_BASE}location%20override.svg`,
     label: 'Location Override',
     dropdownLabel: 'Location Overrides',
   },
-  { key: 'duplicate', icon: 'copy', label: 'Duplicate' },
-  { key: 'add-new', icon: 'plus', label: 'Add New' },
+  { key: 'duplicate', icon: 'copy', iconSrc: `${ICON_BASE}duplicate.svg`, label: 'Duplicate' },
+  { key: 'add-new', icon: 'plus', iconSrc: `${ICON_BASE}addnew.svg`, label: 'Add New' },
 ]
 
 const DELETE_ACTION: ActionDef = {
@@ -233,12 +251,21 @@ function ToolbarIconButton({
   return (
     <button
       type="button"
-      className={`rbd-icon-btn${action.danger ? ' rbd-icon-btn--danger' : ''}`}
+      className={`rbd-icon-btn rbd-icon-btn--plain${action.danger ? ' rbd-icon-btn--danger' : ''}`}
       title={action.dropdownLabel ?? action.label}
       aria-label={action.dropdownLabel ?? action.label}
       onClick={() => onSelect(action.key)}
     >
-      <Icon name={action.icon} size={18} />
+      {action.iconSrc ? (
+        <img
+          src={action.iconSrc}
+          alt=""
+          aria-hidden="true"
+          className="rbd-action-icon rbd-action-icon--plain"
+        />
+      ) : (
+        <Icon name={action.icon} size={18} />
+      )}
     </button>
   )
 }
@@ -256,7 +283,11 @@ function ToolbarLabelButton({
       className={`rbd-label-btn${action.danger ? ' rbd-label-btn--danger' : ''}`}
       onClick={() => onSelect(action.key)}
     >
-      <Icon name={action.icon} size={16} />
+      {action.iconSrc ? (
+        <img src={action.iconSrc} alt="" aria-hidden="true" className="rbd-action-icon" />
+      ) : (
+        <Icon name={action.icon} size={16} />
+      )}
       <span>{action.label}</span>
     </button>
   )
@@ -286,15 +317,23 @@ function ActionsDropdown({ onSelect }: { onSelect: (key: string) => void }) {
 
   return (
     <div className="rbd-actions-dropdown" ref={containerRef}>
-      <button
-        type="button"
-        className="rbd-actions-dropdown__trigger"
-        onClick={() => setOpen((value) => !value)}
-        aria-expanded={open}
-      >
-        <span>Actions</span>
-        <Icon name="chevron-down" size={14} />
-      </button>
+      <div className="rbd-actions-dropdown__trigger-wrap" aria-expanded={open}>
+        <VegaButton
+          type="button"
+          className="rbd-actions-dropdown__trigger"
+          label="Actions"
+          variant="secondary"
+          size="default"
+          onClick={() => setOpen((value) => !value)}
+          aria-expanded={open}
+        />
+        <img
+          src={`${ICON_BASE}dropdown.svg`}
+          alt=""
+          aria-hidden="true"
+          className="rbd-actions-dropdown__trigger-icon"
+        />
+      </div>
       {open && (
         <div className="rbd-actions-dropdown__menu" role="menu">
           {DROPDOWN_GROUPS.map((group, groupIndex) => (
@@ -307,7 +346,16 @@ function ActionsDropdown({ onSelect }: { onSelect: (key: string) => void }) {
                   className={`rbd-actions-dropdown__item${action.danger ? ' rbd-actions-dropdown__item--danger' : ''}`}
                   onClick={() => selectAndClose(action.key)}
                 >
-                  <Icon name={action.icon} size={16} />
+                  {action.key === 'location-overrides' ? (
+                    <img
+                      src={`${ICON_BASE}location%20override.svg`}
+                      alt=""
+                      aria-hidden="true"
+                      className="rbd-actions-dropdown__location-icon"
+                    />
+                  ) : (
+                    <Icon name={action.icon} size={16} />
+                  )}
                   <span>{action.dropdownLabel ?? action.label}</span>
                 </button>
               ))}
@@ -363,7 +411,11 @@ const ResponsiveButtonsDemo: FC = () => {
     <div className="rbd-page">
       <header className="rbd-header">
         <div className="rbd-header__left">
-          <button type="button" className="rbd-header__icon-btn" aria-label="Menu">
+          <button
+            type="button"
+            className="rbd-header__utility-btn rbd-header__utility-btn--menu"
+            aria-label="Menu"
+          >
             <Icon name="menu" size={18} />
           </button>
           <div className="rbd-header__brand">
@@ -372,17 +424,21 @@ const ResponsiveButtonsDemo: FC = () => {
           </div>
         </div>
         <div className="rbd-header__right">
-          <div className="rbd-header__location">
+          <button type="button" className="rbd-header__location" aria-label="All Locations">
+            <Icon name="map-pin" size={18} />
             <span>All Locations</span>
-            <Icon name="chevron-down" size={13} />
-          </div>
-          <button type="button" className="rbd-header__icon-btn" aria-label="Sync">
-            <Icon name="upload" size={17} />
+            <Icon name="chevron-down" size={17} />
           </button>
-          <button type="button" className="rbd-header__icon-btn" aria-label="Help">
-            <Icon name="help-circle" size={17} />
+          <button type="button" className="rbd-header__utility-btn" aria-label="Publish">
+            <img src={`${ICON_BASE}Publish.svg`} alt="" aria-hidden="true" />
           </button>
-          <div className="rbd-header__avatar">AA</div>
+          <button type="button" className="rbd-header__utility-btn" aria-label="Info">
+            <img src={`${ICON_BASE}info.svg`} alt="" aria-hidden="true" />
+          </button>
+          <button type="button" className="rbd-header__account" aria-label="Account menu">
+            <span className="rbd-header__avatar">AA</span>
+            <Icon name="chevron-down" size={18} />
+          </button>
         </div>
       </header>
 
@@ -406,7 +462,7 @@ const ResponsiveButtonsDemo: FC = () => {
                 aria-label="Back"
                 onClick={() => handleAction('back')}
               >
-                <Icon name="arrow-left" size={16} />
+                <img src={`${ICON_BASE}arrow_back.svg`} alt="" aria-hidden="true" />
               </button>
               <h1 className="rbd-item-title">{name || 'Untitled Item'}</h1>
             </div>
@@ -417,19 +473,34 @@ const ResponsiveButtonsDemo: FC = () => {
                   <ActionsDropdown onSelect={handleAction} />
                 </div>
                 <div className="rbd-actions__icons">
-                  {TOOLBAR_ROW_ACTIONS.map((action) => (
-                    <ToolbarIconButton key={action.key} action={action} onSelect={handleAction} />
-                  ))}
+                  <ToolbarIconButton action={DELETE_ACTION} onSelect={handleAction} />
+                  <span className="rbd-actions__icon-divider" aria-hidden="true" />
+                  <div className="rbd-actions__icon-stack" aria-label="Toolbar icon actions">
+                    {TOOLBAR_ACTIONS.map((action, index) => (
+                      <div className="rbd-actions__icon-item" key={action.key}>
+                        {index > 0 && <span className="rbd-actions__icon-divider" aria-hidden="true" />}
+                        <ToolbarIconButton action={action} onSelect={handleAction} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <div className="rbd-actions__labels">
-                  {TOOLBAR_ROW_ACTIONS.map((action) => (
-                    <ToolbarLabelButton key={action.key} action={action} onSelect={handleAction} />
+                  {TOOLBAR_ROW_ACTIONS.map((action, index) => (
+                    <div className="rbd-actions__label-item" key={action.key}>
+                      {index > 0 && <span className="rbd-actions__icon-divider" aria-hidden="true" />}
+                      <ToolbarLabelButton action={action} onSelect={handleAction} />
+                    </div>
                   ))}
                 </div>
               </div>
-              <button type="button" className="rbd-save-btn" onClick={() => handleAction('save')}>
-                Save
-              </button>
+              <VegaButton
+                className="rbd-save-btn"
+                label="Save"
+                variant="primary"
+                size="default"
+                type="button"
+                onClick={() => handleAction('save')}
+              />
             </div>
           </div>
 

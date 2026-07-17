@@ -20,10 +20,12 @@
 ### 1. 启动开发服务器
 ```bash
 cd /Users/aai/Downloads/my-first-prototype
-npm run dev
+npm run dev -- --host 0.0.0.0 --port 5175
 ```
 
-访问 `http://localhost:5174` 在浏览器中查看。
+访问 `http://localhost:5175/#/` 在浏览器中查看。
+
+提示：`localhost` 预览链接只有在本机开发服务器运行时才可用。电脑重启、睡眠恢复或关闭终端后，需要重新执行上面的命令。
 
 ### 2. 构建生产版本
 ```bash
