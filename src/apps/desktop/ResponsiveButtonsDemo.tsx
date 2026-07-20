@@ -317,22 +317,22 @@ function ActionsDropdown({ onSelect }: { onSelect: (key: string) => void }) {
 
   return (
     <div className="rbd-actions-dropdown" ref={containerRef}>
-      <div className="rbd-actions-dropdown__trigger-wrap" aria-expanded={open}>
-        <VegaButton
+      <div className="rbd-actions-dropdown__trigger-wrap">
+        <button
           type="button"
-          className="rbd-actions-dropdown__trigger"
-          label="Actions"
-          variant="secondary"
-          size="default"
+          className="rbd-actions-dropdown__trigger-btn"
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
-        />
-        <img
-          src={`${ICON_BASE}dropdown.svg`}
-          alt=""
-          aria-hidden="true"
-          className="rbd-actions-dropdown__trigger-icon"
-        />
+          aria-haspopup="menu"
+        >
+          <span>Actions</span>
+          <img
+            src={`${ICON_BASE}dropdown.svg`}
+            alt=""
+            aria-hidden="true"
+            className="rbd-actions-dropdown__trigger-btn-icon"
+          />
+        </button>
       </div>
       {open && (
         <div className="rbd-actions-dropdown__menu" role="menu">

@@ -433,36 +433,34 @@ body:has(.rbd-page) {
 }
 
 .rbd-actions-dropdown__trigger-wrap {
-  position: relative;
   display: inline-flex;
   align-items: center;
 }
 
-.rbd-actions-dropdown__trigger {
-  --v-text-link: 38, 42, 255;
-  --v-text-link-hover: 38, 42, 255;
-  --v-text-link-active: 38, 42, 255;
-  --v-border-secondary-btn: 38, 42, 255;
-  --v-border-secondary-btn-hover: 38, 42, 255;
-  --v-border-secondary-btn-active: 38, 42, 255;
-  --v-bg-action-secondary-hover: 238, 240, 255, 1;
-  --v-bg-action-secondary-active: 219, 220, 255, 1;
+.rbd-actions-dropdown__trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #262aff;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #262aff;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
 }
 
-.rbd-actions-dropdown__trigger::part(button) {
-  padding-left: 8px;
-  padding-right: 24px;
+.rbd-actions-dropdown__trigger-btn:hover {
+  background: #eef0ff;
 }
 
-.rbd-actions-dropdown__trigger-icon {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
+.rbd-actions-dropdown__trigger-btn-icon {
+  width: 14px;
+  height: 14px;
   object-fit: contain;
-  pointer-events: none;
 }
 
 .rbd-actions-dropdown__menu {
