@@ -10,12 +10,12 @@ function eventValue(event: Event): string {
   return ''
 }
 
-export function DesktopEmailReceiptSettings() {
+export function DesktopEmailReceiptSettings({ onDirty }: Readonly<{ onDirty: () => void }>) {
   const [subject, setSubject] = useState('')
   const [bodyText, setBodyText] = useState('')
 
   return <div className="rbd-email-settings">
-    <VegaInput label="Email Subject" value={subject} onVegaChange={(event: Event) => setSubject(eventValue(event))} />
-    <VegaTextarea label="Email Body Text" value={bodyText} rows={6} onVegaChange={(event: Event) => setBodyText(eventValue(event))} />
+    <VegaInput label="Email Subject" value={subject} onVegaChange={(event: Event) => { const value = eventValue(event); if (value !== subject) { setSubject(value); onDirty() } }} />
+    <VegaTextarea label="Email Body Text" value={bodyText} rows={6} onVegaChange={(event: Event) => { const value = eventValue(event); if (value !== bodyText) { setBodyText(value); onDirty() } }} />
   </div>
 }

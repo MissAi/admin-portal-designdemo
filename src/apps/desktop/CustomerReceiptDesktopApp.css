@@ -136,6 +136,14 @@ body:has(.rbd-page) { background: #eef2f6; }
 	font: 600 16px/1.25 Inter, sans-serif;
 }
 
+.rbd-responsive-actions-menu.is-disabled summary,
+.rbd-responsive-actions-menu button:disabled,
+.rbd-discard-action:disabled,
+.rbd-undo:disabled {
+	color: #a5adb6;
+	cursor: default;
+}
+
 .rbd-responsive-actions-menu button {
 	width: 100%;
 	padding: 9px 10px;

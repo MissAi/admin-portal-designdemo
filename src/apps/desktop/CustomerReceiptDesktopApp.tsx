@@ -23,6 +23,8 @@ const RECEIPT_TABS = [
   { label: 'E-Mail Receipts', dataTarget: 'receipt-email' },
 ]
 
+const DEFAULT_DISPLAY_SETTINGS: Record<string, boolean> = { separator: true, promise: false, surcharge: false, modifiers: true, duplicates: false, seat: false, tax: false }
+
 function getVegaValue(event: Event): string {
   const detail = (event as CustomEvent<unknown>).detail
   if (typeof detail === 'string') return detail
@@ -30,12 +32,12 @@ function getVegaValue(event: Event): string {
   return ''
 }
 
-function DiscardResponsiveAction() {
-  const discardButton = (className: string, showLabel: boolean) => <button type="button" className={className} aria-label="Discard changes" title="Discard changes"><DiscardChangesIcon />{showLabel && <span>Discard Changes</span>}</button>
+function DiscardResponsiveAction({ disabled = false, onDiscard }: Readonly<{ disabled?: boolean; onDiscard?: () => void }>) {
+  const discardButton = (className: string, showLabel: boolean) => <button type="button" className={className} aria-label="Discard changes" title="Discard changes" disabled={disabled} onClick={onDiscard}><DiscardChangesIcon tone={disabled ? 'neutral' : 'action'} disabled={disabled} />{showLabel && <span>Discard Changes</span>}</button>
 
   return <ResponsiveActionGroup
     ariaLabel="Settings actions"
-    collapsed={<details className="rbd-responsive-actions-menu"><summary>Actions</summary><div role="menu"><button type="button" role="menuitem"><DiscardChangesIcon /><span>Discard Changes</span></button></div></details>}
+    collapsed={<details className={`rbd-responsive-actions-menu${disabled ? ' is-disabled' : ''}`}><summary onClick={(event) => { if (disabled) event.preventDefault() }}>Actions</summary><div role="menu"><button type="button" role="menuitem" disabled={disabled} onClick={onDiscard}><DiscardChangesIcon tone={disabled ? 'neutral' : 'action'} disabled={disabled} /><span>Discard Changes</span></button></div></details>}
     icons={discardButton('rbd-undo', false)}
     labels={discardButton('rbd-discard-action', true)}
   />
@@ -122,7 +124,7 @@ const CustomerReceiptDesktopApp: FC = () => {
   const [location, setLocation] = useState('Ange - Mobile Save')
   const [section, setSection] = useState('Customer Receipt')
   const [tab, setTab] = useState('receipt-display')
-  const [settings, setSettings] = useState<Record<string, boolean>>({ separator: true, promise: false, surcharge: false, modifiers: true, duplicates: false, seat: false, tax: false })
+  const [settings, setSettings] = useState<Record<string, boolean>>({ ...DEFAULT_DISPLAY_SETTINGS })
   const chooseLocation = (nextLocation: string) => { setLocation(nextLocation); if (nextLocation !== 'All Locations') setSection('Settings') }
   const isLocationSetup = location !== 'All Locations'
   const showCustomerReceipt = section === 'Customer Receipt'
@@ -158,22 +160,29 @@ const CustomerReceiptDesktopApp: FC = () => {
 }
 
 function CustomerReceiptSettings({ tab, setTab, settings, setSettings }: Readonly<{ tab: string; setTab: (tab: string) => void; settings: Record<string, boolean>; setSettings: (settings: Record<string, boolean>) => void }>) {
+  const [isDirty, setIsDirty] = useState(false)
+  const [resetVersion, setResetVersion] = useState(0)
+  const discardChanges = () => {
+    setSettings({ ...DEFAULT_DISPLAY_SETTINGS })
+    setResetVersion((version) => version + 1)
+    setIsDirty(false)
+  }
   return <DesktopSettingsArea
     className="customer-receipt-settings-area"
     ariaLabel="Customer receipt settings"
-    header={<div className="rbd-page-actions"><DiscardResponsiveAction /><VegaButton label="Save" variant="primary" disabled size="small" /></div>}
+    header={<div className="rbd-page-actions"><DiscardResponsiveAction disabled={!isDirty} onDiscard={discardChanges} /><VegaButton label="Save" variant="primary" disabled size="small" /></div>}
     secondaryHeader={<VegaTabGroup className="rbd-customer-tabs" variant="primary" gap="size-8" showCloseButton={false} tabItems={RECEIPT_TABS} selectedTabDataTarget={tab} onVegaClick={(event: CustomEvent<string>) => setTab(event.detail)} />}
   >
-    {tab === 'receipt-display' && <DesktopFormLayout ariaLabel="Receipt display form"><Display settings={settings} setSettings={setSettings} /></DesktopFormLayout>}
-    {tab === 'receipt-editor' && <DesktopFormLayout ariaLabel="Receipt editor form"><Editor /></DesktopFormLayout>}
-    {tab === 'receipt-email' && <DesktopFormLayout ariaLabel="Email receipts form"><DesktopEmailReceiptSettings /></DesktopFormLayout>}
+    {tab === 'receipt-display' && <DesktopFormLayout ariaLabel="Receipt display form"><Display key={`display-${resetVersion}`} settings={settings} setSettings={setSettings} onDirty={() => setIsDirty(true)} /></DesktopFormLayout>}
+    {tab === 'receipt-editor' && <DesktopFormLayout ariaLabel="Receipt editor form"><Editor key={`editor-${resetVersion}`} onDirty={() => setIsDirty(true)} /></DesktopFormLayout>}
+    {tab === 'receipt-email' && <DesktopFormLayout ariaLabel="Email receipts form"><DesktopEmailReceiptSettings key={`email-${resetVersion}`} onDirty={() => setIsDirty(true)} /></DesktopFormLayout>}
   </DesktopSettingsArea>
 }
 
-function LocationSettings({ location }: { location: string }) { const [locationName, setLocationName] = useState(location); const [language, setLanguage] = useState('Account Default'); return <DesktopSettingsArea ariaLabel="Location settings" header={<div className="rbd-page-actions"><DiscardResponsiveAction /><VegaButton label="Save" variant="primary" disabled size="small" /></div>}><section className="rbd-location-settings"><div className="rbd-location-banner"><span>Bring your menus to life<br />with digital menu boards</span></div><div className="rbd-settings-tabs"><span className="is-active">Location Info</span><span>App Settings</span><span>Payroll Settings</span><span>Transaction Settings</span></div><section className="rbd-location-form"><h1>Location Info</h1><div className="rbd-location-form__top"><div className="rbd-logo-tile">Set Logo</div><div><Field label="Location Number" value="3412520003" disabled /><Field label="Reseller" value="7498reseller" disabled /></div></div><Field label="Location Name *" value={locationName} onChange={setLocationName} /><Field label="Country *" value="United States" disabled /><Field label="Language" value={language} onChange={setLanguage} /></section></section></DesktopSettingsArea> }
+function LocationSettings({ location }: { location: string }) { const [locationName, setLocationName] = useState(location); const [language, setLanguage] = useState('Account Default'); const isDirty = locationName !== location || language !== 'Account Default'; const discardChanges = () => { setLocationName(location); setLanguage('Account Default') }; return <DesktopSettingsArea ariaLabel="Location settings" header={<div className="rbd-page-actions"><DiscardResponsiveAction disabled={!isDirty} onDiscard={discardChanges} /><VegaButton label="Save" variant="primary" disabled size="small" /></div>}><section className="rbd-location-settings"><div className="rbd-location-banner"><span>Bring your menus to life<br />with digital menu boards</span></div><div className="rbd-settings-tabs"><span className="is-active">Location Info</span><span>App Settings</span><span>Payroll Settings</span><span>Transaction Settings</span></div><section className="rbd-location-form"><h1>Location Info</h1><div className="rbd-location-form__top"><div className="rbd-logo-tile">Set Logo</div><div><Field label="Location Number" value="3412520003" disabled /><Field label="Reseller" value="7498reseller" disabled /></div></div><Field label="Location Name *" value={locationName} onChange={setLocationName} /><Field label="Country *" value="United States" disabled /><Field label="Language" value={language} onChange={setLanguage} /></section></section></DesktopSettingsArea> }
 function Field({ label, value, disabled, onChange }: { label: string; value: string; disabled?: boolean; onChange?: (value: string) => void }) { return <VegaInput label={label} value={value} disabled={disabled} onVegaChange={onChange ? (event: Event) => onChange(getVegaValue(event)) : undefined} /> }
-function Display({ settings, setSettings }: { settings: Record<string, boolean>; setSettings: (settings: Record<string, boolean>) => void }) { const [modifierVisibility, setModifierVisibility] = useState('hide-all'); const toggle = (key: string) => setSettings({ ...settings, [key]: !settings[key] }); return <div className="rbd-display-form"><CheckField label="Hide Separator Lines" checked={settings.separator} onChange={() => toggle('separator')} /><CheckField label="Show Promised Time" checked={settings.promise} onChange={() => toggle('promise')} /><CheckField label="Show Surcharge Clause" checked={settings.surcharge} onChange={() => toggle('surcharge')} /><CheckField label="Roll Up Modifiers Prices" checked={settings.modifiers} onChange={() => toggle('modifiers')} /><CheckField label="Roll Up Duplicates" checked={settings.duplicates} onChange={() => toggle('duplicates')} /><VegaInputSelect label="Modifiers" selectType="single" source={[{ id: 'hide-all', displayName: 'Hide All' }, { id: 'show-all', displayName: 'Show All' }]} value={modifierVisibility} vegaDropdownProps={{ searchable: false }} onVegaChange={(event: Event) => setModifierVisibility(getVegaValue(event))} /><CheckField label="Show Seat Details" checked={settings.seat} onChange={() => toggle('seat')} /><CheckField label="Show Tax-Inclusive Details" checked={settings.tax} onChange={() => toggle('tax')} /></div> }
-function Editor() {
+function Display({ settings, setSettings, onDirty }: { settings: Record<string, boolean>; setSettings: (settings: Record<string, boolean>) => void; onDirty: () => void }) { const [modifierVisibility, setModifierVisibility] = useState('hide-all'); const toggle = (key: string) => { setSettings({ ...settings, [key]: !settings[key] }); onDirty() }; return <div className="rbd-display-form"><CheckField label="Hide Separator Lines" checked={settings.separator} onChange={() => toggle('separator')} /><CheckField label="Show Promised Time" checked={settings.promise} onChange={() => toggle('promise')} /><CheckField label="Show Surcharge Clause" checked={settings.surcharge} onChange={() => toggle('surcharge')} /><CheckField label="Roll Up Modifiers Prices" checked={settings.modifiers} onChange={() => toggle('modifiers')} /><CheckField label="Roll Up Duplicates" checked={settings.duplicates} onChange={() => toggle('duplicates')} /><VegaInputSelect label="Modifiers" selectType="single" source={[{ id: 'hide-all', displayName: 'Hide All' }, { id: 'show-all', displayName: 'Show All' }]} value={modifierVisibility} vegaDropdownProps={{ searchable: false }} onVegaChange={(event: Event) => { const value = getVegaValue(event); if (value && value !== modifierVisibility) { setModifierVisibility(value); onDirty() } }} /><CheckField label="Show Seat Details" checked={settings.seat} onChange={() => toggle('seat')} /><CheckField label="Show Tax-Inclusive Details" checked={settings.tax} onChange={() => toggle('tax')} /></div> }
+function Editor({ onDirty }: Readonly<{ onDirty: () => void }>) {
   const [selectedSection, setSelectedSection] = useState<ReceiptSectionId | null>(null)
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [isLogoPickerOpen, setIsLogoPickerOpen] = useState(false)
@@ -204,6 +213,7 @@ function Editor() {
   const setLines = activeKind === 'header' ? setHeaderLines : setFooterLines
   const updateLine = (updatedLine: ReceiptLine) => {
     setLines((lines) => lines.map((line) => line.id === updatedLine.id ? updatedLine : line))
+    onDirty()
   }
   const addLine = (kind: 'header' | 'footer') => {
     const lines = kind === 'header' ? headerLines : footerLines
@@ -219,6 +229,7 @@ function Editor() {
     setActiveLineId(nextLine.id)
     draftTextRef.current = ''
     setFocusNewLine(true)
+    onDirty()
   }
   const removeLine = () => {
     if (!activeKind || !activeLine) return
@@ -227,6 +238,7 @@ function Editor() {
     setFocusNewLine(false)
     if (remainingLines.length === 0) setSelectedSection(null)
     else setActiveLineId(remainingLines[0].id)
+    onDirty()
   }
   const handleSettingsFocusLeave = () => {
     if (!focusNewLine || !activeLine || draftTextRef.current.trim()) return
@@ -257,8 +269,8 @@ function Editor() {
   }, [selectedSection])
 
   return <>
-    <div className="rbd-editor"><div className="rbd-editor__preview-pane"><ReceiptPreview selectedSection={selectedSection} activeLineId={activeLineId} logoUrl={logoUrl} headerLines={headerLines} footerLines={footerLines} bodyFont={bodyFont} bodySize={bodySize} topMargin={topMargin} bottomMargin={bottomMargin} onSelectSection={selectSection} onSelectLine={selectLine} /></div><div className="rbd-editor__settings">{showMarginSettings ? <DesktopMarginSettings topMargin={topMargin} bottomMargin={bottomMargin} onTopMarginChange={setTopMargin} onBottomMarginChange={setBottomMargin} /> : selectedSection === 'body' ? <DesktopBodySettings font={bodyFont} size={bodySize} onFontChange={setBodyFont} onSizeChange={setBodySize} /> : activeKind && activeLine ? <DesktopReceiptLineSettings key={`${activeKind}-${activeLine.id}`} kind={activeKind} line={activeLine} shouldFocus={focusNewLine} onChange={updateLine} onTextChange={(text) => { draftTextRef.current = text }} onAdd={() => addLine(activeKind)} onRemove={removeLine} onFocusLeave={handleSettingsFocusLeave} /> : <><div className="rbd-editor__hint"><div className="rbd-editor__illustration-viewport"><img className="rbd-editor__illustration" src={`${import.meta.env.BASE_URL}empty%20illustration_customer%20receipt.svg`} alt="" /></div><p>Click the part of the receipt you want to edit.</p></div><div className="rbd-editor__buttons"><VegaButton className="rbd-editor__button" label="Add Footer Line" variant="secondary" onVegaClick={() => addLine('footer')} /><VegaButton className="rbd-editor__button" label="Add Header Line" variant="primary" onVegaClick={() => addLine('header')} /></div></>}</div></div>
-    <DesktopLogoPickerModal open={isLogoPickerOpen} savedLogoUrl={logoUrl} onClose={closeLogoPicker} onSave={setLogoUrl} />
+    <div className="rbd-editor"><div className="rbd-editor__preview-pane"><ReceiptPreview selectedSection={selectedSection} activeLineId={activeLineId} logoUrl={logoUrl} headerLines={headerLines} footerLines={footerLines} bodyFont={bodyFont} bodySize={bodySize} topMargin={topMargin} bottomMargin={bottomMargin} onSelectSection={selectSection} onSelectLine={selectLine} /></div><div className="rbd-editor__settings">{showMarginSettings ? <DesktopMarginSettings topMargin={topMargin} bottomMargin={bottomMargin} onTopMarginChange={(value) => { if (value !== topMargin) { setTopMargin(value); onDirty() } }} onBottomMarginChange={(value) => { if (value !== bottomMargin) { setBottomMargin(value); onDirty() } }} /> : selectedSection === 'body' ? <DesktopBodySettings font={bodyFont} size={bodySize} onFontChange={(value) => { if (value !== bodyFont) { setBodyFont(value); onDirty() } }} onSizeChange={(value) => { if (value !== bodySize) { setBodySize(value); onDirty() } }} /> : activeKind && activeLine ? <DesktopReceiptLineSettings key={`${activeKind}-${activeLine.id}`} kind={activeKind} line={activeLine} shouldFocus={focusNewLine} onChange={updateLine} onTextChange={(text) => { draftTextRef.current = text }} onAdd={() => addLine(activeKind)} onRemove={removeLine} onFocusLeave={handleSettingsFocusLeave} /> : <><div className="rbd-editor__hint"><div className="rbd-editor__illustration-viewport"><img className="rbd-editor__illustration" src={`${import.meta.env.BASE_URL}empty%20illustration_customer%20receipt.svg`} alt="" /></div><p>Click the part of the receipt you want to edit.</p></div><div className="rbd-editor__buttons"><VegaButton className="rbd-editor__button" label="Add Footer Line" variant="secondary" onVegaClick={() => addLine('footer')} /><VegaButton className="rbd-editor__button" label="Add Header Line" variant="primary" onVegaClick={() => addLine('header')} /></div></>}</div></div>
+    <DesktopLogoPickerModal open={isLogoPickerOpen} savedLogoUrl={logoUrl} onClose={closeLogoPicker} onSave={(value) => { if (value !== logoUrl) { setLogoUrl(value); onDirty() } }} />
   </>
 }
 export default CustomerReceiptDesktopApp
