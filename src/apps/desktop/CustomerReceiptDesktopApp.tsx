@@ -119,8 +119,8 @@ function ReceiptBodySample({ font, size, ...props }: ReturnType<typeof getReceip
 }
 
 const CustomerReceiptDesktopApp: FC = () => {
-  const [location, setLocation] = useState('All Locations')
-  const [section, setSection] = useState('Settings')
+  const [location, setLocation] = useState('Ange - Mobile Save')
+  const [section, setSection] = useState('Customer Receipt')
   const [tab, setTab] = useState('receipt-display')
   const [settings, setSettings] = useState<Record<string, boolean>>({ separator: true, promise: false, surcharge: false, modifiers: true, duplicates: false, seat: false, tax: false })
   const chooseLocation = (nextLocation: string) => { setLocation(nextLocation); if (nextLocation !== 'All Locations') setSection('Settings') }
