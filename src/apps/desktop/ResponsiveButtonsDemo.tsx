@@ -461,6 +461,7 @@ const ResponsiveButtonsDemo: FC = () => {
         subtitle: 'Menu',
         location: 'All Locations',
       }}
+      currentFeatureName="Items"
       navigation={
         <DesktopSideNavigation
           items={LEFT_NAV_ITEMS}
