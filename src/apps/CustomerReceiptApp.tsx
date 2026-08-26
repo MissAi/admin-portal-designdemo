@@ -6,6 +6,8 @@ import EmailReceipts from '../screens/EmailReceipts'
 import DisplaySettings from '../screens/DisplaySettings'
 import HeaderFooterLines from '../screens/HeaderFooterLines'
 import LogoImagePicker from '../screens/LogoImagePicker'
+import ReceiptEditor from '../screens/ReceiptEditor'
+import MarginSettings from '../screens/MarginSettings'
 import HomeBar from '../components/HomeBar'
 import '../App.css'
 
@@ -17,6 +19,8 @@ type Screen =
   | 'logo-image-picker'
   | 'header-footer'
   | 'email-receipts'
+  | 'receipt-editor'
+  | 'margins'
 
 type ScreenMotionPreset = 'page' | 'drawer'
 
@@ -28,6 +32,8 @@ const SCREEN_MOTION: Record<Screen, ScreenMotionPreset> = {
   'logo-image-picker': 'page',
   'header-footer': 'page',
   'email-receipts': 'page',
+  'receipt-editor': 'page',
+  margins: 'page',
 }
 
 export default function CustomerReceiptApp() {
@@ -89,15 +95,14 @@ export default function CustomerReceiptApp() {
               setShowSaveSuccessToast(false)
             }}
             onDisplayClick={() => goToScreen('display')}
-            onBodyClick={() => goToScreen('body')}
-            onHeaderFooterClick={() => goToScreen('header-footer')}
+            onReceiptEditorClick={() => goToScreen('receipt-editor')}
             onEmailReceiptsClick={() => goToScreen('email-receipts')}
             onHamburgerClick={() => goToScreen('left-nav')}
           />
         )}
         {screen === 'body' && (
           <BodySettings
-            onBack={() => goToScreen('receipt-list')}
+            onBack={() => goToScreen('receipt-editor')}
             onDirty={markDirty}
           />
         )}
@@ -127,13 +132,27 @@ export default function CustomerReceiptApp() {
         )}
         {screen === 'header-footer' && (
           <HeaderFooterLines
-            onBack={() => goToScreen('receipt-list')}
+            onBack={() => goToScreen('receipt-editor')}
             onDirty={markDirty}
           />
         )}
         {screen === 'email-receipts' && (
           <EmailReceipts
             onBack={() => goToScreen('receipt-list')}
+            onDirty={markDirty}
+          />
+        )}
+        {screen === 'receipt-editor' && (
+          <ReceiptEditor
+            onBack={() => goToScreen('receipt-list')}
+            onBodyClick={() => goToScreen('body')}
+            onHeaderFooterClick={() => goToScreen('header-footer')}
+            onMarginsClick={() => goToScreen('margins')}
+          />
+        )}
+        {screen === 'margins' && (
+          <MarginSettings
+            onBack={() => goToScreen('receipt-editor')}
             onDirty={markDirty}
           />
         )}

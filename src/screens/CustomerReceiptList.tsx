@@ -9,17 +9,15 @@ interface Props {
   onOpenAuditTrail: () => void
   onDiscardChanges: () => void
   onDisplayClick: () => void
-  onBodyClick: () => void
-  onHeaderFooterClick: () => void
+  onReceiptEditorClick: () => void
   onEmailReceiptsClick: () => void
   onHamburgerClick: () => void
 }
 
 const ITEMS = [
   { label: 'Display', tappable: true },
-  { label: 'Body', tappable: true },
-  { label: 'Header & Footer Lines', tappable: true },
-  { label: 'E-Mail Receipts', tappable: true },
+  { label: 'Receipt Editor', tappable: true },
+  { label: 'Email Receipt', tappable: true },
 ]
 
 const ICON_VERSION = '20260715-1710'
@@ -33,8 +31,7 @@ const CustomerReceiptList: FC<Props> = ({
   onOpenAuditTrail,
   onDiscardChanges,
   onDisplayClick,
-  onBodyClick,
-  onHeaderFooterClick,
+  onReceiptEditorClick,
   onEmailReceiptsClick,
   onHamburgerClick,
 }) => {
@@ -60,9 +57,8 @@ const CustomerReceiptList: FC<Props> = ({
 
   function handleItemClick(label: string) {
     if (label === 'Display') onDisplayClick()
-    if (label === 'Body') onBodyClick()
-    if (label === 'Header & Footer Lines') onHeaderFooterClick()
-    if (label === 'E-Mail Receipts') onEmailReceiptsClick()
+    if (label === 'Receipt Editor') onReceiptEditorClick()
+    if (label === 'Email Receipt') onEmailReceiptsClick()
   }
 
   return (

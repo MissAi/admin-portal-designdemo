@@ -1,0 +1,18 @@
+:root {
+  --desktop-page-background: #eef2f6;
+}
+
+body:has(.desktop-page),
+.desktop-page {
+  background-color: var(--desktop-page-background);
+}
+
+.desktop-page__header,
+.desktop-page__content,
+.desktop-page__navigation-region,
+.desktop-page__form-region,
+.desktop-page .rbd-header,
+.desktop-page .rbd-body,
+.desktop-page .rbd-main {
+  background-color: transparent;
+}

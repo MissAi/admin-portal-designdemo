@@ -1,0 +1,39 @@
+#root:has(> .desktop-page-layout) {
+  display: block;
+  min-height: 100vh;
+  padding: 0;
+}
+
+body:has(.desktop-page-layout) {
+  background: var(--desktop-page-background);
+}
+
+.desktop-page-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  flex-direction: column;
+  color: #04041c;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.desktop-page-layout__body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  gap: 16px;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.desktop-page-layout__navigation {
+  flex-shrink: 0;
+}
+
+.desktop-page-layout__settings {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow-y: auto;
+}

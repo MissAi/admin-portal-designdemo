@@ -1,0 +1,38 @@
+.responsive-action-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.responsive-action-group__collapsed {
+  display: flex;
+}
+
+.responsive-action-group__icons,
+.responsive-action-group__labels {
+  display: none;
+}
+
+@media (min-width: 1025px) {
+  .responsive-action-group__collapsed {
+    display: none;
+  }
+
+  .responsive-action-group__icons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+@media (min-width: 1800px) {
+  .responsive-action-group__icons {
+    display: none;
+  }
+
+  .responsive-action-group__labels {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+}

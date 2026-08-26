@@ -1,5 +1,115 @@
 # 🎓 Prototype 编码教学 – 概念讲解
 
+## Desktop Global Header Rule
+
+All desktop pages must use `DesktopGlobalHeader`. Do not copy header markup or
+page-specific header CSS. The shared header owns the Figma layout, uploaded icons,
+Genius AI, Location, Publish, Resource Center, Avatar, and focus-ring styles.
+
+```tsx
+<DesktopGlobalHeader
+  title="Redwood Grill"
+  subtitle="Menu"
+  location="All Locations"
+/>
+```
+
+## Desktop Side Navigation Rule
+
+All desktop pages with side navigation must use `DesktopSideNavigation`. Do not
+copy navigation markup or page-specific navigation CSS. Pass the page's item list,
+selected item, accessible label, and optional selection callback.
+
+```tsx
+<DesktopSideNavigation
+  items={items}
+  selectedItem={selectedItem}
+  ariaLabel="Menu sections"
+  onSelect={setSelectedItem}
+/>
+```
+
+## Desktop Page Layout Rule
+
+Every new desktop page must use `DesktopPageLayout`. It owns the global header,
+navigation region, settings region, background, spacing, and scrolling behavior.
+Do not rebuild this structure with page-specific wrappers or CSS.
+
+Settings content must use `DesktopSettingsArea`, which owns the settings header
+and white settings surface. Add-item and edit-item screens must render
+`DesktopItemEditorHeader` as that header. It owns Back, title, responsive actions,
+and Save.
+
+```tsx
+<DesktopPageLayout
+  headerProps={{ title: 'Redwood Grill', subtitle: 'Menu', location }}
+  navigation={
+    <DesktopSideNavigation
+      items={items}
+      selectedItem={selectedItem}
+      ariaLabel="Menu sections"
+      onSelect={setSelectedItem}
+    />
+  }
+>
+  <DesktopSettingsArea
+    ariaLabel="Item settings"
+    header={
+      <DesktopItemEditorHeader
+        title={itemName}
+        collapsedActions={<ActionsMenu />}
+        iconActions={<IconActions />}
+        labeledActions={<LabeledActions />}
+        onBack={handleBack}
+        onSave={handleSave}
+      />
+    }
+  >
+    <ItemSettingsForm />
+  </DesktopSettingsArea>
+</DesktopPageLayout>
+```
+
+## Desktop Form Layout Rule
+
+Every standard non-table desktop form must use `DesktopFormLayout`. The settings
+background stretches to the available screen width. The form stays left-aligned
+inside that background with `24px` outer padding.
+
+The form container is at most `1008px` wide, has `24px` internal padding on all
+sides, and is transparent by default. Do not add page-specific width, alignment,
+outer padding, inner padding, or background rules to the form container. Tables,
+receipt previews, editors, and other non-form workspaces are exempt.
+
+```tsx
+<DesktopSettingsArea header={header} ariaLabel="Item settings">
+  <DesktopFormLayout ariaLabel="Item form">
+    <ItemSettingsFields />
+  </DesktopFormLayout>
+</DesktopSettingsArea>
+```
+
+## Desktop Responsive Action Rule
+
+Every desktop page with a group of page-level actions must render its three
+representations through `ResponsiveActionGroup`. `DesktopItemEditorHeader`
+already applies it for add-item and edit-item pages. Do not create page-specific
+media queries for these states.
+
+- Up to `1024px`: show the collapsed actions menu.
+- From `1025px` through `1799px`: show icon-only actions with tooltips.
+- At `1800px` and above: show labeled actions.
+
+```tsx
+import ResponsiveActionGroup from './components/ResponsiveActionGroup'
+
+<ResponsiveActionGroup
+  collapsed={<ActionsMenu />}
+  icons={<IconActions />}
+  labels={<LabeledActions />}
+/>
+```
+
 ## 概念 1：什么是 React 组件？
 
 你的代码用的是 **React**，一个 JavaScript 库。React 的核心是"组件"。
@@ -203,7 +313,7 @@ App.tsx (顶层路由器)
 ## 你现在可以修改什么？
 
 ✅ **文字标签** — 改 "Customer Receipt" 为其他文字  
-✅ **颜色** — 改 `color: '#0097FF'` 为其他色码  
+✅ **颜色** — 改 `color: '#262AFF'` 为其他色码  
 ✅ **宽度/高度/边距** — 改 padding/margin 值  
 ✅ **逻辑** — 改按钮的功能（加新的状态变化）  
 ✅ **列表内容** — 加更多菜单项或表单字段  

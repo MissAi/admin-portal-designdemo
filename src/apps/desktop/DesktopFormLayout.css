@@ -1,0 +1,18 @@
+.desktop-form-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100%;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 24px;
+}
+
+.desktop-form-layout__form {
+  display: flex;
+  width: 100%;
+  max-width: 1008px;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: transparent;
+}

@@ -1,0 +1,199 @@
+.desktop-global-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  align-self: stretch;
+  min-height: 84px;
+  padding: 16px 24px 8px;
+  background: transparent;
+  color: #04041c;
+}
+
+.desktop-global-header__identity {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.desktop-global-header__title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.05;
+}
+
+.desktop-global-header__title strong {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.desktop-global-header__title span {
+  color: #6b747d;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.desktop-global-header__actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.desktop-global-header__control {
+  display: flex;
+  height: 52px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #cdd1d3;
+  border-radius: 9999px;
+  background: #fcfcfc;
+  color: #04041c;
+  cursor: pointer;
+  font: 700 14px/1 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.desktop-global-header__control:hover {
+  background: #f6f7f8;
+}
+
+.desktop-global-header__control:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(19, 98, 226, 0.25);
+}
+
+.desktop-global-header__menu {
+  width: 52px;
+  padding: 16px;
+}
+
+.desktop-global-header__menu img {
+  width: 20px;
+  height: 20px;
+}
+
+.desktop-global-header__genius,
+.desktop-global-header__location,
+.desktop-global-header__icon-control {
+  padding: 16px;
+  gap: 4px;
+}
+
+.desktop-global-header__genius-mark {
+  color: #262aff;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.desktop-global-header__location-wrap {
+  position: relative;
+}
+
+.desktop-global-header__location {
+  white-space: nowrap;
+}
+
+.desktop-global-header__location img:first-child {
+  width: 15px;
+  height: 20px;
+}
+
+.desktop-global-header__location img:last-child,
+.desktop-global-header__avatar img:last-child {
+  width: 12px;
+  height: 12px;
+}
+
+.desktop-global-header__icon-control img {
+  display: block;
+  flex-shrink: 0;
+}
+
+.desktop-global-header__publish img {
+  width: 15px;
+  height: 20px;
+}
+
+.desktop-global-header__resource img {
+  width: 20px;
+  height: 20px;
+}
+
+.desktop-global-header__avatar {
+  padding: 8px 8px 8px 4px;
+  gap: 8px;
+}
+
+.desktop-global-header__avatar img:first-child {
+  width: 16px;
+  height: 16px;
+  margin: 0 10px;
+}
+
+.desktop-global-header__location-menu {
+  position: absolute;
+  z-index: 30;
+  top: 60px;
+  left: 0;
+  width: 224px;
+  padding: 8px 0;
+  border: 1px solid #abc6d8;
+  border-radius: 8px;
+  background: #fcfcfc;
+  box-shadow: 0 8px 20px rgba(4, 4, 28, 0.14);
+}
+
+.desktop-global-header__location-menu button {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  border: 0;
+  background: transparent;
+  color: #04041c;
+  cursor: pointer;
+  font: 500 16px/1.25 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-align: left;
+}
+
+.desktop-global-header__location-menu button:hover,
+.desktop-global-header__location-menu button:focus-visible {
+  background: #f0f3f7;
+  outline: none;
+}
+
+@media (max-width: 900px) {
+  .desktop-global-header {
+    padding-inline: 12px;
+  }
+
+  .desktop-global-header__title span,
+  .desktop-global-header__genius span {
+    display: none;
+  }
+
+  .desktop-global-header__identity {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .desktop-global-header__actions {
+    gap: 4px;
+  }
+
+  .desktop-global-header__location {
+    max-width: 165px;
+  }
+
+  .desktop-global-header__location span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .desktop-global-header__genius,
+  .desktop-global-header__icon-control,
+  .desktop-global-header__avatar {
+    display: none;
+  }
+}

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type FC } from 'react'
 import {
-  VegaButton,
   VegaImageUploader,
   VegaInput,
   VegaInputNumeric,
@@ -8,6 +7,11 @@ import {
   VegaTextarea,
   VegaTooltip,
 } from '@globalpayments/vega-react'
+import { DesktopFormLayout } from './DesktopFormLayout'
+import { DesktopItemEditorHeader } from './DesktopItemEditorHeader'
+import { DesktopPageLayout } from './DesktopPageLayout'
+import { DesktopSettingsArea } from './DesktopSettingsArea'
+import { DesktopSideNavigation } from './DesktopSideNavigation'
 import './ResponsiveButtonsDemo.css'
 
 const ICON_BASE = `${import.meta.env.BASE_URL}icons/`
@@ -451,108 +455,56 @@ const ResponsiveButtonsDemo: FC = () => {
   }
 
   return (
-    <div className="rbd-page">
-      <header className="rbd-header">
-        <div className="rbd-header__left">
-          <button
-            type="button"
-            className="rbd-header__utility-btn rbd-header__utility-btn--menu"
-            aria-label="Menu"
-          >
-            <Icon name="menu" size={18} />
-          </button>
-          <div className="rbd-header__brand">
-            <span className="rbd-header__brand-name">Redwood Grill</span>
-            <span className="rbd-header__brand-sub">Menu</span>
-          </div>
-        </div>
-        <div className="rbd-header__right">
-          <button type="button" className="rbd-header__location" aria-label="All Locations">
-            <Icon name="map-pin" size={18} />
-            <span>All Locations</span>
-            <Icon name="chevron-down" size={17} />
-          </button>
-          <button type="button" className="rbd-header__utility-btn" aria-label="Publish">
-            <img src={`${ICON_BASE}Publish.svg`} alt="" aria-hidden="true" />
-          </button>
-          <button type="button" className="rbd-header__utility-btn" aria-label="Info">
-            <img src={`${ICON_BASE}info.svg`} alt="" aria-hidden="true" />
-          </button>
-          <button type="button" className="rbd-header__account" aria-label="Account menu">
-            <span className="rbd-header__avatar">AA</span>
-            <Icon name="chevron-down" size={18} />
-          </button>
-        </div>
-      </header>
-
-      <div className="rbd-body">
-        <nav className="rbd-leftnav" aria-label="Menu sections">
-          <ul>
-            {LEFT_NAV_ITEMS.map((item) => (
-              <li key={item} className={item === 'Items' ? 'is-active' : undefined}>
-                {item}
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <main className="rbd-main">
-          <div className="rbd-toolbar">
-            <div className="rbd-toolbar__left">
-              <button
-                type="button"
-                className="rbd-back-btn"
-                aria-label="Back"
-                onClick={() => handleAction('back')}
-              >
-                <img src={`${ICON_BASE}arrow_back.svg`} alt="" aria-hidden="true" />
-              </button>
-              <h1 className="rbd-item-title">{name || 'Untitled Item'}</h1>
-            </div>
-
-            <div className="rbd-toolbar__right">
-              <div className="rbd-actions">
-                <div className="rbd-actions__collapsed">
-                  <ActionsDropdown onSelect={handleAction} />
-                </div>
-                <div className="rbd-actions__icons">
-                  <VegaTooltip text={DELETE_ACTION.label} trigger="hover" placement="top">
-                    <ToolbarIconButton action={DELETE_ACTION} onSelect={handleAction} />
-                  </VegaTooltip>
-                  <span className="rbd-actions__icon-divider" aria-hidden="true" />
-                  <div className="rbd-actions__icon-stack" aria-label="Toolbar icon actions">
-                    {TOOLBAR_ACTIONS.map((action, index) => (
-                      <div className="rbd-actions__icon-item" key={action.key}>
-                        {index > 0 && <span className="rbd-actions__icon-divider" aria-hidden="true" />}
-                        <VegaTooltip text={action.label} trigger="hover" placement="top">
-                          <ToolbarIconButton action={action} onSelect={handleAction} />
-                        </VegaTooltip>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="rbd-actions__labels">
-                  {TOOLBAR_ROW_ACTIONS.map((action, index) => (
-                    <div className="rbd-actions__label-item" key={action.key}>
+    <DesktopPageLayout
+      headerProps={{
+        title: 'Redwood Grill',
+        subtitle: 'Menu',
+        location: 'All Locations',
+      }}
+      navigation={
+        <DesktopSideNavigation
+          items={LEFT_NAV_ITEMS}
+          selectedItem="Items"
+          ariaLabel="Menu sections"
+        />
+      }
+    >
+      <DesktopSettingsArea
+        ariaLabel="Item settings"
+        header={
+          <DesktopItemEditorHeader
+            title={name || 'Untitled Item'}
+            collapsedActions={<ActionsDropdown onSelect={handleAction} />}
+            iconActions={
+              <>
+                <VegaTooltip text={DELETE_ACTION.label} trigger="hover" placement="top">
+                  <ToolbarIconButton action={DELETE_ACTION} onSelect={handleAction} />
+                </VegaTooltip>
+                <span className="rbd-actions__icon-divider" aria-hidden="true" />
+                <div className="rbd-actions__icon-stack" aria-label="Toolbar icon actions">
+                  {TOOLBAR_ACTIONS.map((action, index) => (
+                    <div className="rbd-actions__icon-item" key={action.key}>
                       {index > 0 && <span className="rbd-actions__icon-divider" aria-hidden="true" />}
-                      <ToolbarLabelButton action={action} onSelect={handleAction} />
+                      <VegaTooltip text={action.label} trigger="hover" placement="top">
+                        <ToolbarIconButton action={action} onSelect={handleAction} />
+                      </VegaTooltip>
                     </div>
                   ))}
                 </div>
+              </>
+            }
+            labeledActions={TOOLBAR_ROW_ACTIONS.map((action, index) => (
+              <div className="rbd-actions__label-item" key={action.key}>
+                {index > 0 && <span className="rbd-actions__icon-divider" aria-hidden="true" />}
+                <ToolbarLabelButton action={action} onSelect={handleAction} />
               </div>
-              <VegaButton
-                className="rbd-save-btn"
-                label="Save"
-                variant="primary"
-                size="default"
-                type="button"
-                onClick={() => handleAction('save')}
-              />
-            </div>
-          </div>
-
-          <div className="rbd-surface">
-            <div className="rbd-form">
+            ))}
+            onBack={() => handleAction('back')}
+            onSave={() => handleAction('save')}
+          />
+        }
+      >
+        <DesktopFormLayout ariaLabel="Item form">
               <div className="rbd-row rbd-row--photo">
                   <div
                     className="rbd-photo-uploader"
@@ -644,11 +596,9 @@ const ResponsiveButtonsDemo: FC = () => {
                 checked={preventDiscounts}
                 onToggle={() => setPreventDiscounts((value) => !value)}
               />
-            </div>
-          </div>
-        </main>
-      </div>
-    </div>
+            </DesktopFormLayout>
+      </DesktopSettingsArea>
+    </DesktopPageLayout>
   )
 }
 

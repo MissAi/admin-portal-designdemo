@@ -76,7 +76,10 @@ const LeftNav: FC<Props> = ({ onSelectCustomerReceipt, onClose }) => {
       >
         <StatusBar />
 
-        <div className="left-nav-scroll" style={{ overflowY: 'auto', paddingTop: 8 }}>
+        <div
+          className="left-nav-scroll"
+          style={{ overflowY: 'auto', minHeight: 0, paddingTop: 8, WebkitOverflowScrolling: 'touch' }}
+        >
           {/* Account header */}
           <div
             style={{
