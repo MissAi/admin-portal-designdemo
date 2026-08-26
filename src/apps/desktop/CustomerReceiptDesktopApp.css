@@ -279,6 +279,13 @@ body:has(.rbd-page) { background: #eef2f6; }
 	text-align: center;
 }
 
+.rbd-receipt-logo {
+	display: block;
+	width: 120px;
+	height: 80px;
+	object-fit: contain;
+}
+
 .rbd-logo-placeholder__plus {
   position: relative;
   width: 24px;
@@ -426,4 +433,132 @@ body:has(.rbd-page) { background: #eef2f6; }
 
 .rbd-receipt-section.is-selected {
 	background: rgba(0, 151, 255, 0.3);
+}
+
+.rbd-logo-picker {
+	--v-bg-action: 38, 42, 255;
+	--v-border-color-action: 38, 42, 255;
+}
+
+.rbd-logo-picker__content {
+	height: 550px;
+	overflow-y: auto;
+	padding: 28px;
+	background: #f7f9fa;
+}
+
+.rbd-logo-picker__grid {
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	gap: 12px;
+}
+
+.rbd-logo-picker__upload,
+.rbd-logo-picker__card {
+	height: 194px;
+	border-radius: 8px;
+}
+
+.rbd-logo-picker__upload {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	border: 1px dashed #abc6d8;
+	background: #f0f3f7;
+	color: #04041c;
+	cursor: pointer;
+}
+
+.rbd-logo-picker__upload-plus {
+	color: #262aff;
+	font-size: 32px;
+	line-height: 32px;
+}
+
+.rbd-logo-picker__upload strong {
+	color: #262aff;
+	font-size: 13px;
+}
+
+.rbd-logo-picker__upload span:last-child {
+	font-size: 11px;
+	line-height: 15px;
+}
+
+.rbd-logo-picker__card {
+	overflow: hidden;
+	background: #fff;
+	box-shadow: 0 2px 8px rgba(2, 2, 15, 0.07);
+}
+
+.rbd-logo-picker__image {
+	position: relative;
+	display: block;
+	width: 100%;
+	height: 152px;
+	padding: 0;
+	border: 2px solid transparent;
+	border-radius: 8px 8px 0 0;
+	background: #fff;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+.rbd-logo-picker__image.is-selected {
+	border-color: #262aff;
+}
+
+.rbd-logo-picker__image > img:first-child {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+.rbd-logo-picker__image .rbd-logo-picker__check {
+	position: absolute;
+	top: 6px;
+	right: 6px;
+	width: 22px;
+	height: 22px;
+}
+
+.rbd-logo-picker__meta {
+	display: flex;
+	height: 42px;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 0 8px;
+	font-size: 12px;
+}
+
+.rbd-logo-picker__meta button {
+	display: grid;
+	width: 24px;
+	height: 24px;
+	place-items: center;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+}
+
+.rbd-logo-picker__meta img {
+	width: 18px;
+	height: 18px;
+}
+
+.rbd-logo-picker__footer {
+	display: flex;
+	width: 100%;
+	justify-content: flex-end;
+	gap: 12px;
+}
+
+@media (max-width: 760px) {
+	.rbd-logo-picker__grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
 }
