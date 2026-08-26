@@ -1,5 +1,7 @@
 .desktop-global-header {
   display: flex;
+  width: 100%;
+  min-width: 0;
   align-items: flex-start;
   justify-content: space-between;
   align-self: stretch;
@@ -11,6 +13,7 @@
 
 .desktop-global-header__identity {
   display: flex;
+  min-width: 0;
   align-items: flex-start;
   gap: 20px;
 }
@@ -35,6 +38,7 @@
 
 .desktop-global-header__actions {
   display: flex;
+  flex-shrink: 0;
   align-items: flex-start;
   gap: 12px;
 }

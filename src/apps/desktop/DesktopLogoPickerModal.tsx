@@ -37,13 +37,17 @@ export function DesktopLogoPickerModal({ open, savedLogoUrl, onClose, onSave }: 
     className="rbd-logo-picker"
     open={open}
     size={900}
-    height="730px"
+    height="714px"
     contentMaxHeight="calc(100vh - 64px)"
     backdrop="static"
     corners="rounded-8"
     margin={{ x: 'auto' }}
     isVerticallyCentered
-    padding={{ header: 'size-24', content: '0', footer: 'size-24' }}
+    padding={{
+      header: 'size-24',
+      content: '0',
+      footer: { top: 'size-24', right: 'size-24', bottom: 'size-24', left: 'size-24' },
+    }}
     showCloseButton
     handleClose={() => true}
     onVegaClose={onClose}

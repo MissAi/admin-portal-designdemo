@@ -1,0 +1,35 @@
+.responsive-desktop-route {
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+}
+
+#root:has(> .responsive-desktop-route) {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  padding: 0;
+}
+
+.responsive-desktop-route__desktop {
+  display: contents;
+}
+
+.responsive-desktop-route__desktop > .rbd-page,
+.responsive-desktop-route__desktop > .desktop-page-layout {
+  width: 100%;
+}
+
+.responsive-desktop-route__mobile {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .responsive-desktop-route__desktop {
+    display: none;
+  }
+
+  .responsive-desktop-route__mobile {
+    display: contents;
+  }
+}

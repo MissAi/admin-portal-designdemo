@@ -7,6 +7,7 @@ import {
   VegaTextarea,
   VegaTooltip,
 } from '@globalpayments/vega-react'
+import { DISCARD_CHANGES_ACTION_ICON_SRC } from '../../components/DiscardChangesIcon'
 import { DesktopFormLayout } from './DesktopFormLayout'
 import { DesktopItemEditorHeader } from './DesktopItemEditorHeader'
 import { DesktopPageLayout } from './DesktopPageLayout'
@@ -212,7 +213,7 @@ const TOOLBAR_ACTIONS: ActionDef[] = [
   {
     key: 'discard',
     icon: 'rotate-ccw',
-    iconSrc: `${ICON_BASE}discard_blue.svg`,
+    iconSrc: DISCARD_CHANGES_ACTION_ICON_SRC,
     label: 'Discard Changes',
   },
   {

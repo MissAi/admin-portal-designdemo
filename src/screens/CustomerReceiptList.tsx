@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type FC } from 'react'
+import DiscardChangesIcon from '../components/DiscardChangesIcon'
 import StatusBar from '../components/StatusBar'
 
 interface Props {
@@ -208,11 +209,7 @@ const CustomerReceiptList: FC<Props> = ({
                   textAlign: 'left',
                 }}
               >
-                <img
-                  src={`${ICON_BASE}discard-changes.svg?v=${ICON_VERSION}`}
-                  alt="Discard changes"
-                  style={{ width: 16, height: 16, objectFit: 'contain', opacity: saveAllEnabled ? 1 : 0.5 }}
-                />
+                <DiscardChangesIcon tone="neutral" disabled={!saveAllEnabled} />
                 <span>Discard Changes</span>
               </button>
 

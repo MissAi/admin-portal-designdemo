@@ -44,20 +44,3 @@
   color: #000000;
   font-weight: 500;
 }
-
-@media (max-width: 900px) {
-  .desktop-side-navigation {
-    width: 160px;
-  }
-}
-
-@media (max-width: 640px) {
-  .desktop-side-navigation {
-    width: 122px;
-  }
-
-  .desktop-side-navigation button {
-    padding: 8px 6px;
-    font-size: 11px;
-  }
-}

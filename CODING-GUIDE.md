@@ -1,10 +1,36 @@
 # 🎓 Prototype 编码教学 – 概念讲解
 
+## Vega Action Color Rule
+
+All Vega components in the prototype use `#262aff` for enabled action color.
+The single source of truth is `src/vega-theme.css`, loaded after Vega's base CSS.
+Do not override Vega action tokens in page or component styles.
+
+This rule covers primary action backgrounds, action borders, links, focus,
+hover, active, and secondary action text/borders. Secondary surfaces remain
+white or transparent, and disabled actions retain Vega's disabled gray styling.
+
+## Discard Changes Icon Rule
+
+All Discard Changes actions must use `DiscardChangesIcon` from
+`src/components/DiscardChangesIcon.tsx`. It uses the approved assets from
+`public/icons` and owns the standard `16px` size and disabled opacity. Do not
+draw a discard/undo SVG or write a discard asset path directly in a page.
+
+- Use the default `action` tone for desktop action groups.
+- Use `tone="neutral"` where the mobile action menu requires the neutral icon.
+- Data-driven action definitions may use `DISCARD_CHANGES_ACTION_ICON_SRC`.
+
 ## Desktop Global Header Rule
 
 All desktop pages must use `DesktopGlobalHeader`. Do not copy header markup or
 page-specific header CSS. The shared header owns the Figma layout, uploaded icons,
 Genius AI, Location, Publish, Resource Center, Avatar, and focus-ring styles.
+
+From `768px` upward, the global header and its route wrapper must always span the
+full available viewport width and adapt their internal spacing/content without
+centering or shrinking the header container. Below `768px`, the desktop global
+header is not displayed because the route switches to the mobile app.
 
 ```tsx
 <DesktopGlobalHeader
@@ -35,6 +61,37 @@ Every new desktop page must use `DesktopPageLayout`. It owns the global header,
 navigation region, settings region, background, spacing, and scrolling behavior.
 Do not rebuild this structure with page-specific wrappers or CSS.
 
+### Mobile App Breakpoint
+
+Every `/d/*` route must use `ResponsiveDesktopRoute` and provide both its desktop
+page and corresponding mobile app. Below `768px`, the route displays the mobile
+app full-screen. At `768px` and above, it displays the desktop page. Do not use
+page-specific JavaScript viewport checks or CSS to simulate the mobile app.
+
+```tsx
+<ResponsiveDesktopRoute
+  desktop={<DesktopFeatureApp />}
+  mobile={<MobileFeatureApp />}
+/>
+```
+
+This rule takes precedence over compact desktop rules. Left-navigation hiding,
+mobile feature titles, and collapsed responsive actions apply to compact desktop
+from `768px` through `1023px`. Below `768px`, the desktop layout is not displayed.
+
+From `768px` through `1023px`, `DesktopPageLayout` hides the entire left
+navigation region, expands the settings region into the available space, and
+shows `currentFeatureName` at the left of the settings header's primary row. Save
+and responsive actions remain at the right of that same row. At `1024px` and
+above, the standard `220px` left navigation is visible and the feature title is
+hidden. Do not add page-specific navigation visibility or feature-title
+breakpoints.
+
+On add-item and edit-item pages below `1024px`, hide the Back button and the
+record/item title from `DesktopItemEditorHeader`. The primary row contains only
+the feature title on the left and responsive actions plus Save on the right.
+Tabs or other secondary header controls remain on a separate row below it.
+
 Settings content must use `DesktopSettingsArea`, which owns the settings header
 and white settings surface. Add-item and edit-item screens must render
 `DesktopItemEditorHeader` as that header. It owns Back, title, responsive actions,
@@ -43,6 +100,7 @@ and Save.
 ```tsx
 <DesktopPageLayout
   headerProps={{ title: 'Redwood Grill', subtitle: 'Menu', location }}
+  currentFeatureName={selectedItem}
   navigation={
     <DesktopSideNavigation
       items={items}
@@ -91,10 +149,12 @@ receipt previews, editors, and other non-form workspaces are exempt.
 
 ## Desktop Responsive Action Rule
 
-Every desktop page with a group of page-level actions must render its three
-representations through `ResponsiveActionGroup`. `DesktopItemEditorHeader`
-already applies it for add-item and edit-item pages. Do not create page-specific
-media queries for these states.
+Every existing and future desktop page action group must render its three
+representations through `ResponsiveActionGroup`; fixed page-action buttons are
+not allowed. `DesktopItemEditorHeader` already applies it for add-item and
+edit-item pages. Other settings headers must compose `ResponsiveActionGroup`
+beside their persistent Save button. Do not create page-specific media queries
+for these states.
 
 - Up to `1024px`: show the collapsed actions menu.
 - From `1025px` through `1799px`: show icon-only actions with tooltips.

@@ -1,0 +1,33 @@
+:root {
+  --v-bg-action: 38, 42, 255, 1;
+  --v-bg-action-hover: 38, 42, 255, 1;
+  --v-bg-action-focus: 38, 42, 255, 1;
+  --v-bg-action-active: 38, 42, 255, 1;
+  --v-bg-action-secondary-hover: 38, 42, 255, 0.1;
+  --v-bg-action-secondary-active: 38, 42, 255, 0.1;
+  --v-border-color-action: 38, 42, 255, 1;
+  --v-border-color-action-hover: 38, 42, 255, 1;
+  --v-border-color-action-active: 38, 42, 255, 1;
+  --v-border-secondary-btn: 38, 42, 255, 1;
+  --v-border-secondary-btn-hover: 38, 42, 255, 1;
+  --v-border-secondary-btn-active: 38, 42, 255, 1;
+  --v-text-link: 38, 42, 255, 1;
+  --v-text-link-hover: 38, 42, 255, 1;
+  --v-text-link-focus: 38, 42, 255, 1;
+  --v-text-link-active: 38, 42, 255, 1;
+  --v-text-link-visited: 38, 42, 255, 1;
+  --v-dark-bg-action: 38, 42, 255, 1;
+  --v-dark-bg-action-hover: 38, 42, 255, 1;
+  --v-dark-bg-action-focus: 38, 42, 255, 1;
+  --v-dark-bg-action-active: 38, 42, 255, 1;
+  --v-dark-bg-action-secondary-hover: 38, 42, 255, 0.1;
+  --v-dark-bg-action-secondary-active: 38, 42, 255, 0.1;
+  --v-dark-border-color-action: 38, 42, 255, 1;
+  --v-dark-border-color-action-hover: 38, 42, 255, 1;
+  --v-dark-border-color-action-active: 38, 42, 255, 1;
+  --v-dark-text-link: 38, 42, 255, 1;
+  --v-dark-text-link-hover: 38, 42, 255, 1;
+  --v-dark-text-link-focus: 38, 42, 255, 1;
+  --v-dark-text-link-active: 38, 42, 255, 1;
+  --v-dark-text-link-visited: 38, 42, 255, 1;
+}

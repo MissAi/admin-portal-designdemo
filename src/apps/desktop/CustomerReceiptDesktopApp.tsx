@@ -1,10 +1,13 @@
-import { useRef, useState, type FC } from 'react'
+import { useEffect, useRef, useState, type FC } from 'react'
 import { VegaButton, VegaInput, VegaInputSelect, VegaTabGroup } from '@globalpayments/vega-react'
+import DiscardChangesIcon from '../../components/DiscardChangesIcon'
 import ResponsiveActionGroup from '../../components/ResponsiveActionGroup'
 import { DesktopFormLayout } from './DesktopFormLayout'
 import { DesktopBodySettings } from './DesktopBodySettings'
+import { DesktopEmailReceiptSettings } from './DesktopEmailReceiptSettings'
 import { DesktopGlobalHeader } from './DesktopGlobalHeader'
 import { DesktopLogoPickerModal } from './DesktopLogoPickerModal'
+import { DesktopMarginSettings } from './DesktopMarginSettings'
 import { DesktopPageLayout } from './DesktopPageLayout'
 import { DesktopReceiptLineSettings, type ReceiptLine } from './DesktopReceiptLineSettings'
 import { DesktopSettingsArea } from './DesktopSettingsArea'
@@ -27,24 +30,12 @@ function getVegaValue(event: Event): string {
   return ''
 }
 
-type IconName = 'menu' | 'pin' | 'chevron' | 'upload' | 'help' | 'account' | 'undo'
-function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
-  const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true }
-  if (name === 'menu') return <svg {...common}><line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" /></svg>
-  if (name === 'pin') return <svg {...common}><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></svg>
-  if (name === 'chevron') return <svg {...common}><polyline points="7 10 12 15 17 10" /></svg>
-  if (name === 'upload') return <svg {...common}><path d="M4 17v3h16v-3" /><path d="m8 9 4-4 4 4" /><line x1="12" y1="5" x2="12" y2="16" /></svg>
-  if (name === 'help') return <svg {...common}><circle cx="12" cy="12" r="9" /><path d="M9.5 9a2.7 2.7 0 1 1 4.5 2c-1.5 1-2 1.5-2 3" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
-  if (name === 'undo') return <svg {...common}><path d="M9 7 5 11l4 4" /><path d="M5 11h8a6 6 0 1 1-6 6" /></svg>
-  return <svg {...common}><circle cx="12" cy="8" r="3" /><path d="M5 21a7 7 0 0 1 14 0" /></svg>
-}
-
 function DiscardResponsiveAction() {
-  const discardButton = (className: string, showLabel: boolean) => <button type="button" className={className} aria-label="Discard changes" title="Discard changes"><Icon name="undo" />{showLabel && <span>Discard Changes</span>}</button>
+  const discardButton = (className: string, showLabel: boolean) => <button type="button" className={className} aria-label="Discard changes" title="Discard changes"><DiscardChangesIcon />{showLabel && <span>Discard Changes</span>}</button>
 
   return <ResponsiveActionGroup
     ariaLabel="Settings actions"
-    collapsed={<details className="rbd-responsive-actions-menu"><summary>Actions</summary><div role="menu"><button type="button" role="menuitem"><Icon name="undo" /><span>Discard Changes</span></button></div></details>}
+    collapsed={<details className="rbd-responsive-actions-menu"><summary>Actions</summary><div role="menu"><button type="button" role="menuitem"><DiscardChangesIcon /><span>Discard Changes</span></button></div></details>}
     icons={discardButton('rbd-undo', false)}
     labels={discardButton('rbd-discard-action', true)}
   />
@@ -82,9 +73,10 @@ function getReceiptSectionProps(sectionId: ReceiptSectionId, selectedSection: Re
   }
 }
 
-function ReceiptPreview({ selectedSection, activeLineId, logoUrl, headerLines, footerLines, bodyFont, bodySize, onSelectSection, onSelectLine }: Readonly<{ selectedSection: ReceiptSectionId | null; activeLineId: number; logoUrl: string | null; headerLines: ReceiptLine[]; footerLines: ReceiptLine[]; bodyFont: string; bodySize: string; onSelectSection: (section: ReceiptSectionId) => void; onSelectLine: (section: 'header' | 'footer', lineId: number) => void }>) {
+function ReceiptPreview({ selectedSection, activeLineId, logoUrl, headerLines, footerLines, bodyFont, bodySize, topMargin, bottomMargin, onSelectSection, onSelectLine }: Readonly<{ selectedSection: ReceiptSectionId | null; activeLineId: number; logoUrl: string | null; headerLines: ReceiptLine[]; footerLines: ReceiptLine[]; bodyFont: string; bodySize: string; topMargin: string; bottomMargin: string; onSelectSection: (section: ReceiptSectionId) => void; onSelectLine: (section: 'header' | 'footer', lineId: number) => void }>) {
   const sectionProps = (sectionId: ReceiptSectionId) => getReceiptSectionProps(sectionId, selectedSection, onSelectSection)
-  return <div className="rbd-receipt-preview-frame"><div className="rbd-receipt-preview__rail" /><section className="rbd-receipt-preview" aria-label="Receipt preview"><p {...sectionProps('top-margin')} className={`${sectionProps('top-margin').className} rbd-receipt-preview__muted rbd-receipt-preview__margin-row`}><span>(Top Margin)</span></p><div {...sectionProps('logo')} className={`${sectionProps('logo').className} rbd-logo-placeholder-row`}>{logoUrl ? <img className="rbd-receipt-logo" src={logoUrl} alt="Selected receipt logo" /> : <div className="rbd-logo-placeholder"><span className="rbd-logo-placeholder__plus" aria-hidden="true" /><span>Set<br />Logo</span></div>}</div>{headerLines.length > 0 && <ReceiptMessageSection section="header" lines={headerLines} activeLineId={activeLineId} isSectionSelected={selectedSection === 'header'} onSelectLine={onSelectLine} />}<ReceiptBodySample {...sectionProps('body')} font={bodyFont} size={bodySize} />{footerLines.length > 0 && <ReceiptMessageSection section="footer" lines={footerLines} activeLineId={activeLineId} isSectionSelected={selectedSection === 'footer'} onSelectLine={onSelectLine} />}<p {...sectionProps('bottom-margin')} className={`${sectionProps('bottom-margin').className} rbd-receipt-preview__muted rbd-receipt-preview__margin-row`}><span>(Bottom Margin)</span></p></section><img className="rbd-receipt-preview__footer-edge" src={`${import.meta.env.BASE_URL}receipt%20footer.svg`} alt="" /></div>
+  const marginHeight = (value: string) => Math.min(30, Math.max(0, Number(value) || 0)) * 30
+  return <div className="rbd-receipt-preview-frame" onClick={(event) => event.stopPropagation()}><div className="rbd-receipt-preview__rail" /><section className="rbd-receipt-preview" aria-label="Receipt preview"><p {...sectionProps('top-margin')} className={`${sectionProps('top-margin').className} rbd-receipt-preview__muted rbd-receipt-preview__margin-row`} style={{ height: `${marginHeight(topMargin)}px` }}><span>(Top Margin)</span></p><div {...sectionProps('logo')} className={`${sectionProps('logo').className} rbd-logo-placeholder-row`}>{logoUrl ? <img className="rbd-receipt-logo" src={logoUrl} alt="Selected receipt logo" /> : <div className="rbd-logo-placeholder"><span className="rbd-logo-placeholder__plus" aria-hidden="true" /><span>Set<br />Logo</span></div>}</div>{headerLines.length > 0 && <ReceiptMessageSection section="header" lines={headerLines} activeLineId={activeLineId} isSectionSelected={selectedSection === 'header'} onSelectLine={onSelectLine} />}<ReceiptBodySample {...sectionProps('body')} font={bodyFont} size={bodySize} />{footerLines.length > 0 && <ReceiptMessageSection section="footer" lines={footerLines} activeLineId={activeLineId} isSectionSelected={selectedSection === 'footer'} onSelectLine={onSelectLine} />}<p {...sectionProps('bottom-margin')} className={`${sectionProps('bottom-margin').className} rbd-receipt-preview__muted rbd-receipt-preview__margin-row`} style={{ height: `${marginHeight(bottomMargin)}px` }}><span>(Bottom Margin)</span></p></section><img className="rbd-receipt-preview__footer-edge" src={`${import.meta.env.BASE_URL}receipt%20footer.svg`} alt="" /></div>
 }
 
 function ReceiptMessageSection({ section, lines, activeLineId, isSectionSelected, onSelectLine }: Readonly<{ section: 'header' | 'footer'; lines: ReceiptLine[]; activeLineId: number; isSectionSelected: boolean; onSelectLine: (section: 'header' | 'footer', lineId: number) => void }>) {
@@ -174,7 +166,7 @@ function CustomerReceiptSettings({ tab, setTab, settings, setSettings }: Readonl
   >
     {tab === 'receipt-display' && <DesktopFormLayout ariaLabel="Receipt display form"><Display settings={settings} setSettings={setSettings} /></DesktopFormLayout>}
     {tab === 'receipt-editor' && <DesktopFormLayout ariaLabel="Receipt editor form"><Editor /></DesktopFormLayout>}
-    {tab === 'receipt-email' && <DesktopFormLayout ariaLabel="Email receipts form"><div className="rbd-empty-state">Email receipt settings</div></DesktopFormLayout>}
+    {tab === 'receipt-email' && <DesktopFormLayout ariaLabel="Email receipts form"><DesktopEmailReceiptSettings /></DesktopFormLayout>}
   </DesktopSettingsArea>
 }
 
@@ -189,6 +181,8 @@ function Editor() {
   const [footerLines, setFooterLines] = useState<ReceiptLine[]>([{ id: 1, text: 'Thank you for visiting us!', font: 'Helvetica-Bold', size: '18', alignment: 'Center' }])
   const [bodyFont, setBodyFont] = useState('Helvetica-Bold')
   const [bodySize, setBodySize] = useState('Small')
+  const [topMargin, setTopMargin] = useState('1')
+  const [bottomMargin, setBottomMargin] = useState('1')
   const [activeLineId, setActiveLineId] = useState(1)
   const [focusNewLine, setFocusNewLine] = useState(false)
   const draftTextRef = useRef('')
@@ -240,9 +234,31 @@ function Editor() {
     setSelectedSection(null)
     setFocusNewLine(false)
   }
+  const clearSelection = () => {
+    setSelectedSection(null)
+    setFocusNewLine(false)
+  }
+  const showMarginSettings = selectedSection === 'top-margin' || selectedSection === 'bottom-margin'
+  const closeLogoPicker = () => {
+    setIsLogoPickerOpen(false)
+    setSelectedSection(null)
+  }
+
+  useEffect(() => {
+    const handlePagePointerDown = (event: PointerEvent) => {
+      if (!selectedSection || !(event.target instanceof Element)) return
+      const receiptEditorForm = event.target.closest('[aria-label="Receipt editor form"]')
+      if (!receiptEditorForm) return
+      if (event.target.closest('.rbd-receipt-preview-frame, .rbd-line-settings, .rbd-body-settings, .rbd-margin-settings, .rbd-editor__hint, .rbd-editor__buttons, .rbd-logo-picker')) return
+      clearSelection()
+    }
+    document.addEventListener('pointerdown', handlePagePointerDown)
+    return () => document.removeEventListener('pointerdown', handlePagePointerDown)
+  }, [selectedSection])
+
   return <>
-    <div className="rbd-editor"><div className="rbd-editor__preview-pane"><ReceiptPreview selectedSection={selectedSection} activeLineId={activeLineId} logoUrl={logoUrl} headerLines={headerLines} footerLines={footerLines} bodyFont={bodyFont} bodySize={bodySize} onSelectSection={selectSection} onSelectLine={selectLine} /></div><div className="rbd-editor__settings">{selectedSection === 'body' ? <DesktopBodySettings font={bodyFont} size={bodySize} onFontChange={setBodyFont} onSizeChange={setBodySize} /> : activeKind && activeLine ? <DesktopReceiptLineSettings key={`${activeKind}-${activeLine.id}`} kind={activeKind} line={activeLine} shouldFocus={focusNewLine} onChange={updateLine} onTextChange={(text) => { draftTextRef.current = text }} onAdd={() => addLine(activeKind)} onRemove={removeLine} onFocusLeave={handleSettingsFocusLeave} /> : <><div className="rbd-editor__hint"><div className="rbd-editor__illustration-viewport"><img className="rbd-editor__illustration" src={`${import.meta.env.BASE_URL}empty%20illustration_customer%20receipt.svg`} alt="" /></div><p>Click the part of the receipt you want to edit.</p></div><div className="rbd-editor__buttons"><VegaButton className="rbd-editor__button" label="Add Footer Line" variant="secondary" onVegaClick={() => addLine('footer')} /><VegaButton className="rbd-editor__button" label="Add Header Line" variant="primary" onVegaClick={() => addLine('header')} /></div></>}</div></div>
-    <DesktopLogoPickerModal open={isLogoPickerOpen} savedLogoUrl={logoUrl} onClose={() => setIsLogoPickerOpen(false)} onSave={(nextLogoUrl) => { setLogoUrl(nextLogoUrl); setSelectedSection(null) }} />
+    <div className="rbd-editor"><div className="rbd-editor__preview-pane"><ReceiptPreview selectedSection={selectedSection} activeLineId={activeLineId} logoUrl={logoUrl} headerLines={headerLines} footerLines={footerLines} bodyFont={bodyFont} bodySize={bodySize} topMargin={topMargin} bottomMargin={bottomMargin} onSelectSection={selectSection} onSelectLine={selectLine} /></div><div className="rbd-editor__settings">{showMarginSettings ? <DesktopMarginSettings topMargin={topMargin} bottomMargin={bottomMargin} onTopMarginChange={setTopMargin} onBottomMarginChange={setBottomMargin} /> : selectedSection === 'body' ? <DesktopBodySettings font={bodyFont} size={bodySize} onFontChange={setBodyFont} onSizeChange={setBodySize} /> : activeKind && activeLine ? <DesktopReceiptLineSettings key={`${activeKind}-${activeLine.id}`} kind={activeKind} line={activeLine} shouldFocus={focusNewLine} onChange={updateLine} onTextChange={(text) => { draftTextRef.current = text }} onAdd={() => addLine(activeKind)} onRemove={removeLine} onFocusLeave={handleSettingsFocusLeave} /> : <><div className="rbd-editor__hint"><div className="rbd-editor__illustration-viewport"><img className="rbd-editor__illustration" src={`${import.meta.env.BASE_URL}empty%20illustration_customer%20receipt.svg`} alt="" /></div><p>Click the part of the receipt you want to edit.</p></div><div className="rbd-editor__buttons"><VegaButton className="rbd-editor__button" label="Add Footer Line" variant="secondary" onVegaClick={() => addLine('footer')} /><VegaButton className="rbd-editor__button" label="Add Header Line" variant="primary" onVegaClick={() => addLine('header')} /></div></>}</div></div>
+    <DesktopLogoPickerModal open={isLogoPickerOpen} savedLogoUrl={logoUrl} onClose={closeLogoPicker} onSave={setLogoUrl} />
   </>
 }
 export default CustomerReceiptDesktopApp

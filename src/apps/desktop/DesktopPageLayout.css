@@ -1,4 +1,4 @@
-#root:has(> .desktop-page-layout) {
+#root:has(.desktop-page-layout) {
   display: block;
   min-height: 100vh;
   padding: 0;
@@ -36,4 +36,10 @@ body:has(.desktop-page-layout) {
   flex: 1;
   flex-direction: column;
   overflow-y: auto;
+}
+
+@media (max-width: 1023px) {
+  .desktop-page-layout__navigation {
+    display: none;
+  }
 }

@@ -193,7 +193,7 @@ body:has(.rbd-page) { background: #eef2f6; }
 .rbd-line-settings h2 {
 	margin: 0;
 	color: #04041c;
-	font-size: 22px;
+	font-size: 18px;
 	line-height: 28px;
 }
 
@@ -257,11 +257,45 @@ body:has(.rbd-page) { background: #eef2f6; }
 	width: 100%;
 	margin: 0;
 	color: #04041c;
-	font-size: 22px;
+	font-size: 18px;
 	line-height: 28px;
 }
 
 .rbd-body-settings vega-input-select {
+	display: block;
+	width: 100%;
+}
+
+.rbd-email-settings {
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.rbd-email-settings vega-input,
+.rbd-email-settings vega-textarea {
+	display: block;
+	width: 100%;
+}
+
+.rbd-margin-settings {
+	display: flex;
+	flex: 1 0 0;
+	flex-direction: column;
+	align-self: stretch;
+	gap: 24px;
+	padding: 24px;
+}
+
+.rbd-margin-settings h2 {
+	margin: 0;
+	color: #04041c;
+	font-size: 18px;
+	line-height: 28px;
+}
+
+.rbd-margin-settings vega-input-numeric {
 	display: block;
 	width: 100%;
 }

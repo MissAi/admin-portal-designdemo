@@ -57,13 +57,17 @@
 
 .desktop-item-editor-header__save {
   white-space: nowrap;
-  --v-bg-action: 38, 42, 255;
-  --v-bg-action-hover: 38, 42, 255;
-  --v-bg-action-active: 38, 42, 255;
-  --v-border-color-action: 38, 42, 255;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1023px) {
+  .desktop-item-editor-header {
+    justify-content: flex-end;
+  }
+
+  .desktop-item-editor-header__identity {
+    display: none;
+  }
+
   .desktop-item-editor-header__commands {
     gap: 16px;
   }
