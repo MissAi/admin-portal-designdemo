@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { VegaButton } from '@globalpayments/vega-react'
+import PageSaveButton from '../../components/PageSaveButton'
 import ResponsiveActionGroup from '../../components/ResponsiveActionGroup'
 import './DesktopItemEditorHeader.css'
 
@@ -13,7 +13,8 @@ type DesktopItemEditorHeaderProps = Readonly<{
   onBack: () => void
   onSave: () => void
   saveLabel?: string
-  saveDisabled?: boolean
+  requiredValues?: readonly (string | number | boolean | readonly unknown[] | null | undefined)[]
+  isDirty?: boolean
 }>
 
 export function DesktopItemEditorHeader({
@@ -24,7 +25,8 @@ export function DesktopItemEditorHeader({
   onBack,
   onSave,
   saveLabel = 'Save',
-  saveDisabled = false,
+  requiredValues = [],
+  isDirty = false,
 }: DesktopItemEditorHeaderProps) {
   return (
     <div className="desktop-item-editor-header">
@@ -46,14 +48,12 @@ export function DesktopItemEditorHeader({
           icons={iconActions}
           labels={labeledActions}
         />
-        <VegaButton
+        <PageSaveButton
           className="desktop-item-editor-header__save"
           label={saveLabel}
-          variant="primary"
-          size="default"
-          type="button"
-          disabled={saveDisabled}
-          onClick={onSave}
+          requiredValues={requiredValues}
+          isDirty={isDirty}
+          onSave={onSave}
         />
       </div>
     </div>

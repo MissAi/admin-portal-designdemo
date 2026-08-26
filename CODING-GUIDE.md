@@ -21,6 +21,26 @@ draw a discard/undo SVG or write a discard asset path directly in a page.
 - Use `tone="neutral"` where the mobile action menu requires the neutral icon.
 - Data-driven action definitions may use `DISCARD_CHANGES_ACTION_ICON_SRC`.
 
+## Save Button State Rule
+
+All desktop page and modal Save actions must use `PageSaveButton` from
+`src/components/PageSaveButton.tsx`. Do not set a page Save button's `disabled`
+state directly.
+
+- When a form has required fields, pass all required values through
+  `requiredValues`. Save is enabled when every required value is filled.
+- When a form has no required fields, omit `requiredValues` and pass `isDirty`.
+  Save is enabled only after the user makes a change.
+- After successfully saving a no-required-fields form, reset `isDirty` so Save
+  becomes disabled again.
+- Mobile `Save All` controls follow the same no-required-fields dirty rule.
+
+```tsx
+<PageSaveButton requiredValues={[name, location]} onSave={handleSave} />
+
+<PageSaveButton isDirty={isDirty} onSave={handleSave} />
+```
+
 ## Desktop Global Header Rule
 
 All desktop pages must use `DesktopGlobalHeader`. Do not copy header markup or

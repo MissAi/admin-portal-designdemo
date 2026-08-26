@@ -503,6 +503,7 @@ const ResponsiveButtonsDemo: FC = () => {
             ))}
             onBack={() => handleAction('back')}
             onSave={() => handleAction('save')}
+            requiredValues={[name]}
           />
         }
       >

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { VegaButton, VegaModal } from '@globalpayments/vega-react'
+import PageSaveButton from '../../components/PageSaveButton'
 
 type LogoItem = {
   id: string
@@ -102,7 +103,7 @@ export function DesktopLogoPickerModal({ open, savedLogoUrl, onClose, onSave }: 
     </div>
     <div slot="modal-footer" className="rbd-logo-picker__footer">
       <VegaButton label="Reset To Default" variant="secondary" size="small" onVegaClick={() => setSelectedLogoUrl(null)} />
-      <VegaButton label="Save" variant="primary" size="small" disabled={selectedLogoUrl === savedLogoUrl} onVegaClick={() => {
+      <PageSaveButton size="small" isDirty={selectedLogoUrl !== savedLogoUrl} onSave={() => {
         onSave(selectedLogoUrl)
         onClose()
       }} />

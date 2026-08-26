@@ -352,16 +352,16 @@ body:has(.rbd-page) { background: #eef2f6; }
   width: 274px;
   height: 160px;
   max-width: 100%;
-  overflow: hidden;
+	overflow: visible;
 }
 
 .rbd-editor__illustration {
 	display: block;
-	width: 274px;
-	height: 296px;
-	max-width: 100%;
+	width: 450px;
+	height: 472px;
+	max-width: none;
 	object-fit: contain;
-	transform: translateY(-68px);
+	transform: translate(-88px, -156px);
 }
 
 .rbd-receipt-preview-frame {
