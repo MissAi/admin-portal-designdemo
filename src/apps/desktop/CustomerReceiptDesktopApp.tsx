@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FC } from 'react'
-import { VegaButton, VegaInput, VegaInputSelect, VegaTabGroup } from '@globalpayments/vega-react'
+import { VegaButton, VegaInput, VegaInputSelect, VegaModal, VegaTabGroup } from '@globalpayments/vega-react'
 import DiscardChangesIcon from '../../components/DiscardChangesIcon'
 import PageSaveButton from '../../components/PageSaveButton'
 import ResponsiveActionGroup from '../../components/ResponsiveActionGroup'
@@ -126,9 +126,26 @@ const CustomerReceiptDesktopApp: FC = () => {
   const [section, setSection] = useState('Customer Receipt')
   const [tab, setTab] = useState('receipt-display')
   const [settings, setSettings] = useState<Record<string, boolean>>({ ...DEFAULT_DISPLAY_SETTINGS })
+  const [hasUnsavedReceiptChanges, setHasUnsavedReceiptChanges] = useState(false)
+  const [pendingSection, setPendingSection] = useState<string | null>(null)
   const chooseLocation = (nextLocation: string) => { setLocation(nextLocation); if (nextLocation !== 'All Locations') setSection('Settings') }
   const isLocationSetup = location !== 'All Locations'
   const showCustomerReceipt = section === 'Customer Receipt'
+  const selectSection = (nextSection: string) => {
+    if (nextSection === section) return
+    if (showCustomerReceipt && hasUnsavedReceiptChanges) {
+      setPendingSection(nextSection)
+      return
+    }
+    setSection(nextSection)
+  }
+  const leaveWithoutSaving = () => {
+    if (!pendingSection) return
+    setSettings({ ...DEFAULT_DISPLAY_SETTINGS })
+    setHasUnsavedReceiptChanges(false)
+    setSection(pendingSection)
+    setPendingSection(null)
+  }
 
   if (isLocationSetup) {
     return <DesktopPageLayout
@@ -140,11 +157,29 @@ const CustomerReceiptDesktopApp: FC = () => {
         onLocationSelect: chooseLocation,
       }}
       currentFeatureName={section}
-      navigation={<DesktopSideNavigation items={SETTINGS_NAV} selectedItem={section} ariaLabel="Location setup sections" onSelect={setSection} />}
+      navigation={<DesktopSideNavigation items={SETTINGS_NAV} selectedItem={section} ariaLabel="Location setup sections" onSelect={selectSection} />}
     >
       {!showCustomerReceipt
         ? <LocationSettings location={location} />
-        : <CustomerReceiptSettings tab={tab} setTab={setTab} settings={settings} setSettings={setSettings} />}
+        : <CustomerReceiptSettings tab={tab} setTab={setTab} settings={settings} setSettings={setSettings} isDirty={hasUnsavedReceiptChanges} setIsDirty={setHasUnsavedReceiptChanges} />}
+      <VegaModal
+        open={pendingSection !== null}
+        size={480}
+        backdrop="static"
+        corners="rounded-8"
+        showCloseButton
+        handleClose={() => true}
+        onVegaClose={() => setPendingSection(null)}
+      >
+        <div slot="modal-title">Leave without saving?</div>
+        <div slot="modal-content" className="rbd-unsaved-dialog__content">
+          Your changes to Customer Receipt will be lost if you leave this page.
+        </div>
+        <div slot="modal-footer" className="rbd-unsaved-dialog__footer">
+          <VegaButton label="Stay" variant="secondary" size="small" onVegaClick={() => setPendingSection(null)} />
+          <VegaButton label="Leave Without Saving" variant="primary" size="small" onVegaClick={leaveWithoutSaving} />
+        </div>
+      </VegaModal>
     </DesktopPageLayout>
   }
 
@@ -160,8 +195,7 @@ const CustomerReceiptDesktopApp: FC = () => {
   </div>
 }
 
-function CustomerReceiptSettings({ tab, setTab, settings, setSettings }: Readonly<{ tab: string; setTab: (tab: string) => void; settings: Record<string, boolean>; setSettings: (settings: Record<string, boolean>) => void }>) {
-  const [isDirty, setIsDirty] = useState(false)
+function CustomerReceiptSettings({ tab, setTab, settings, setSettings, isDirty, setIsDirty }: Readonly<{ tab: string; setTab: (tab: string) => void; settings: Record<string, boolean>; setSettings: (settings: Record<string, boolean>) => void; isDirty: boolean; setIsDirty: (isDirty: boolean) => void }>) {
   const [resetVersion, setResetVersion] = useState(0)
   const discardChanges = () => {
     setSettings({ ...DEFAULT_DISPLAY_SETTINGS })
@@ -174,9 +208,9 @@ function CustomerReceiptSettings({ tab, setTab, settings, setSettings }: Readonl
     header={<div className="rbd-page-actions"><DiscardResponsiveAction disabled={!isDirty} onDiscard={discardChanges} /><PageSaveButton isDirty={isDirty} onSave={() => setIsDirty(false)} size="small" /></div>}
     secondaryHeader={<VegaTabGroup className="rbd-customer-tabs" variant="primary" gap="size-8" showCloseButton={false} tabItems={RECEIPT_TABS} selectedTabDataTarget={tab} onVegaClick={(event: CustomEvent<string>) => setTab(event.detail)} />}
   >
-    {tab === 'receipt-display' && <DesktopFormLayout ariaLabel="Receipt display form"><Display key={`display-${resetVersion}`} settings={settings} setSettings={setSettings} onDirty={() => setIsDirty(true)} /></DesktopFormLayout>}
-    {tab === 'receipt-editor' && <DesktopFormLayout ariaLabel="Receipt editor form"><Editor key={`editor-${resetVersion}`} onDirty={() => setIsDirty(true)} /></DesktopFormLayout>}
-    {tab === 'receipt-email' && <DesktopFormLayout ariaLabel="Email receipts form"><DesktopEmailReceiptSettings key={`email-${resetVersion}`} onDirty={() => setIsDirty(true)} /></DesktopFormLayout>}
+    <div className="rbd-receipt-tab-panel" hidden={tab !== 'receipt-display'}><DesktopFormLayout ariaLabel="Receipt display form"><Display key={`display-${resetVersion}`} settings={settings} setSettings={setSettings} onDirty={() => setIsDirty(true)} /></DesktopFormLayout></div>
+    <div className="rbd-receipt-tab-panel" hidden={tab !== 'receipt-editor'}><DesktopFormLayout ariaLabel="Receipt editor form"><Editor key={`editor-${resetVersion}`} onDirty={() => setIsDirty(true)} /></DesktopFormLayout></div>
+    <div className="rbd-receipt-tab-panel" hidden={tab !== 'receipt-email'}><DesktopFormLayout ariaLabel="Email receipts form"><DesktopEmailReceiptSettings key={`email-${resetVersion}`} onDirty={() => setIsDirty(true)} /></DesktopFormLayout></div>
   </DesktopSettingsArea>
 }
 

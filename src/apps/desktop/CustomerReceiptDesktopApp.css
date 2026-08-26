@@ -91,6 +91,23 @@ body:has(.rbd-page) { background: #eef2f6; }
 	flex-direction: column;
 }
 
+.rbd-receipt-tab-panel[hidden] {
+	display: none;
+}
+
+.rbd-unsaved-dialog__content {
+	padding: 0 24px 24px;
+	color: #04041c;
+	font-size: 16px;
+	line-height: 1.5;
+}
+
+.rbd-unsaved-dialog__footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+}
+
 .rbd-responsive-actions-menu {
 	position: relative;
 }
