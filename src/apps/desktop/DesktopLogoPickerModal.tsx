@@ -41,6 +41,8 @@ export function DesktopLogoPickerModal({ open, savedLogoUrl, onClose, onSave }: 
     contentMaxHeight="calc(100vh - 64px)"
     backdrop="static"
     corners="rounded-8"
+    margin={{ x: 'auto' }}
+    isVerticallyCentered
     padding={{ header: 'size-24', content: '0', footer: 'size-24' }}
     showCloseButton
     handleClose={() => true}
@@ -57,10 +59,10 @@ export function DesktopLogoPickerModal({ open, savedLogoUrl, onClose, onSave }: 
 
         {logoItems.map((logo) => {
           const isSelected = selectedLogoUrl === logo.url
-          return <article className="rbd-logo-picker__card" key={logo.id}>
+          return <article className={`rbd-logo-picker__card${isSelected ? ' is-selected' : ''}`} key={logo.id}>
             <button
               type="button"
-              className={`rbd-logo-picker__image${isSelected ? ' is-selected' : ''}`}
+              className="rbd-logo-picker__image"
               aria-label={`Select ${logo.name}`}
               aria-pressed={isSelected}
               onClick={() => setSelectedLogoUrl(logo.url)}
