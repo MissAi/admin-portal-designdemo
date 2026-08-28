@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FC } from 'react'
+import { useEffect, useState, type FC } from 'react'
 import { VegaButton, VegaInput, VegaInputSelect, VegaModal, VegaTabGroup } from '@globalpayments/vega-react'
 import DiscardChangesIcon from '../../components/DiscardChangesIcon'
 import PageSaveButton from '../../components/PageSaveButton'
@@ -84,7 +84,10 @@ function ReceiptPreview({ selectedSection, activeLineId, logoUrl, headerLines, f
 
 function ReceiptMessageSection({ section, lines, activeLineId, isSectionSelected, onSelectLine }: Readonly<{ section: 'header' | 'footer'; lines: ReceiptLine[]; activeLineId: number; isSectionSelected: boolean; onSelectLine: (section: 'header' | 'footer', lineId: number) => void }>) {
   return <div className="rbd-receipt-preview__message-section">
-    {lines.map((line, index) => <div
+    {lines.map((line, index) => {
+      const fontSize = Number(line.size) || 12
+      const previewHeight = Math.max(30, fontSize * 2)
+      return <div
       className={`rbd-receipt-section rbd-receipt-preview__message-line${isSectionSelected && activeLineId === line.id ? ' is-selected' : ''}`}
       key={line.id}
       role="button"
@@ -98,8 +101,9 @@ function ReceiptMessageSection({ section, lines, activeLineId, isSectionSelected
           onSelectLine(section, line.id)
         }
       }}
-      style={{ fontFamily: line.font.startsWith('Menlo') ? 'Menlo, monospace' : 'Helvetica, Arial, sans-serif', fontSize: `${line.size}px`, fontWeight: line.font.endsWith('Bold') ? 700 : 400, justifyContent: line.alignment === 'Center' ? 'center' : line.alignment === 'Right' ? 'flex-end' : 'flex-start', textAlign: line.alignment.toLowerCase() as React.CSSProperties['textAlign'] }}
-    >{line.text || '\u00a0'}</div>)}
+      style={{ height: `${previewHeight}px`, fontFamily: line.font.startsWith('Menlo') ? 'Menlo, monospace' : 'Helvetica, Arial, sans-serif', fontSize: `${line.size}px`, fontWeight: line.font.endsWith('Bold') ? 700 : 400, justifyContent: line.alignment === 'Center' ? 'center' : line.alignment === 'Right' ? 'flex-end' : 'flex-start', textAlign: line.alignment.toLowerCase() as React.CSSProperties['textAlign'] }}
+    >{line.text || '\u00a0'}</div>
+    })}
   </div>
 }
 
@@ -229,7 +233,6 @@ function Editor({ onDirty }: Readonly<{ onDirty: () => void }>) {
   const [bottomMargin, setBottomMargin] = useState('1')
   const [activeLineId, setActiveLineId] = useState(1)
   const [focusNewLine, setFocusNewLine] = useState(false)
-  const draftTextRef = useRef('')
   const selectSection = (nextSection: ReceiptSectionId) => {
     setSelectedSection(nextSection)
     setFocusNewLine(false)
@@ -262,7 +265,6 @@ function Editor({ onDirty }: Readonly<{ onDirty: () => void }>) {
     else setFooterLines(insertAfterSelected)
     setSelectedSection(kind)
     setActiveLineId(nextLine.id)
-    draftTextRef.current = ''
     setFocusNewLine(true)
     onDirty()
   }
@@ -274,12 +276,6 @@ function Editor({ onDirty }: Readonly<{ onDirty: () => void }>) {
     if (remainingLines.length === 0) setSelectedSection(null)
     else setActiveLineId(remainingLines[0].id)
     onDirty()
-  }
-  const handleSettingsFocusLeave = () => {
-    if (!focusNewLine || !activeLine || draftTextRef.current.trim()) return
-    setLines((lines) => lines.filter((line) => line.id !== activeLine.id))
-    setSelectedSection(null)
-    setFocusNewLine(false)
   }
   const clearSelection = () => {
     setSelectedSection(null)
@@ -304,7 +300,7 @@ function Editor({ onDirty }: Readonly<{ onDirty: () => void }>) {
   }, [selectedSection])
 
   return <>
-    <div className="rbd-editor"><div className="rbd-editor__preview-pane"><ReceiptPreview selectedSection={selectedSection} activeLineId={activeLineId} logoUrl={logoUrl} headerLines={headerLines} footerLines={footerLines} bodyFont={bodyFont} bodySize={bodySize} topMargin={topMargin} bottomMargin={bottomMargin} onSelectSection={selectSection} onSelectLine={selectLine} /></div><div className="rbd-editor__settings">{showMarginSettings ? <DesktopMarginSettings topMargin={topMargin} bottomMargin={bottomMargin} onTopMarginChange={(value) => { if (value !== topMargin) { setTopMargin(value); onDirty() } }} onBottomMarginChange={(value) => { if (value !== bottomMargin) { setBottomMargin(value); onDirty() } }} /> : selectedSection === 'body' ? <DesktopBodySettings font={bodyFont} size={bodySize} onFontChange={(value) => { if (value !== bodyFont) { setBodyFont(value); onDirty() } }} onSizeChange={(value) => { if (value !== bodySize) { setBodySize(value); onDirty() } }} /> : activeKind && activeLine ? <DesktopReceiptLineSettings key={`${activeKind}-${activeLine.id}`} kind={activeKind} line={activeLine} shouldFocus={focusNewLine} onChange={updateLine} onTextChange={(text) => { draftTextRef.current = text }} onAdd={() => addLine(activeKind)} onRemove={removeLine} onFocusLeave={handleSettingsFocusLeave} /> : <><div className="rbd-editor__hint"><div className="rbd-editor__illustration-viewport"><img className="rbd-editor__illustration" src={`${import.meta.env.BASE_URL}empty%20illustration_customer%20receipt.svg`} alt="" /></div><p>Click the part of the receipt you want to edit.</p></div><div className="rbd-editor__buttons"><VegaButton className="rbd-editor__button" label="Add Footer Line" variant="secondary" onVegaClick={() => addLine('footer')} /><VegaButton className="rbd-editor__button" label="Add Header Line" variant="primary" onVegaClick={() => addLine('header')} /></div></>}</div></div>
+    <div className="rbd-editor"><div className="rbd-editor__preview-pane"><ReceiptPreview selectedSection={selectedSection} activeLineId={activeLineId} logoUrl={logoUrl} headerLines={headerLines} footerLines={footerLines} bodyFont={bodyFont} bodySize={bodySize} topMargin={topMargin} bottomMargin={bottomMargin} onSelectSection={selectSection} onSelectLine={selectLine} /></div><div className="rbd-editor__settings">{showMarginSettings ? <DesktopMarginSettings topMargin={topMargin} bottomMargin={bottomMargin} onTopMarginChange={(value) => { if (value !== topMargin) { setTopMargin(value); onDirty() } }} onBottomMarginChange={(value) => { if (value !== bottomMargin) { setBottomMargin(value); onDirty() } }} /> : selectedSection === 'body' ? <DesktopBodySettings font={bodyFont} size={bodySize} onFontChange={(value) => { if (value !== bodyFont) { setBodyFont(value); onDirty() } }} onSizeChange={(value) => { if (value !== bodySize) { setBodySize(value); onDirty() } }} /> : activeKind && activeLine ? <DesktopReceiptLineSettings key={`${activeKind}-${activeLine.id}`} kind={activeKind} line={activeLine} shouldFocus={focusNewLine} onChange={updateLine} onAdd={() => addLine(activeKind)} onRemove={removeLine} /> : <><div className="rbd-editor__hint"><div className="rbd-editor__illustration-viewport"><img className="rbd-editor__illustration" src={`${import.meta.env.BASE_URL}empty%20illustration_customer%20receipt.svg`} alt="" /></div><p>Click the part of the receipt you want to edit.</p></div><div className="rbd-editor__buttons"><VegaButton className="rbd-editor__button" label="Add Footer Line" variant="secondary" onVegaClick={() => addLine('footer')} /><VegaButton className="rbd-editor__button" label="Add Header Line" variant="primary" onVegaClick={() => addLine('header')} /></div></>}</div></div>
     <DesktopLogoPickerModal open={isLogoPickerOpen} savedLogoUrl={logoUrl} onClose={closeLogoPicker} onSave={(value) => { if (value !== logoUrl) { setLogoUrl(value); onDirty() } }} />
   </>
 }

@@ -14,10 +14,8 @@ type DesktopReceiptLineSettingsProps = Readonly<{
   line: ReceiptLine
   shouldFocus: boolean
   onChange: (line: ReceiptLine) => void
-  onTextChange: (text: string) => void
   onAdd: () => void
   onRemove: () => void
-  onFocusLeave: () => void
 }>
 
 const FONTS = ['Helvetica-Bold', 'Helvetica-Regular', 'Menlo-Bold', 'Menlo-Regular']
@@ -34,7 +32,7 @@ function eventValue(event: Event): string {
   return ''
 }
 
-export function DesktopReceiptLineSettings({ kind, line, shouldFocus, onChange, onTextChange, onAdd, onRemove, onFocusLeave }: DesktopReceiptLineSettingsProps) {
+export function DesktopReceiptLineSettings({ kind, line, shouldFocus, onChange, onAdd, onRemove }: DesktopReceiptLineSettingsProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const title = kind === 'header' ? 'Header Lines' : 'Footer Lines'
   const update = (changes: Partial<ReceiptLine>) => onChange({ ...line, ...changes })
@@ -43,21 +41,14 @@ export function DesktopReceiptLineSettings({ kind, line, shouldFocus, onChange, 
     if (shouldFocus) textareaRef.current?.focus()
   }, [line.id, shouldFocus])
 
-  return <section className="rbd-line-settings" aria-label={`${title} settings`} onBlur={(event) => {
-    const nextTarget = event.relatedTarget
-    if (nextTarget instanceof Node && event.currentTarget.contains(nextTarget)) return
-    onFocusLeave()
-  }}>
+  return <section className="rbd-line-settings" aria-label={`${title} settings`}>
     <div className="rbd-line-settings__fields">
       <h2>{title}</h2>
       <textarea
         ref={textareaRef}
         aria-label={`${kind === 'header' ? 'Header' : 'Footer'} line text`}
         value={line.text}
-        onInput={(event) => {
-          onTextChange(event.currentTarget.value)
-          update({ text: event.currentTarget.value })
-        }}
+        onInput={(event) => update({ text: event.currentTarget.value })}
         onChange={() => undefined}
       />
       <VegaInputSelect label="Font" selectType="single" source={source(FONTS)} value={line.font} vegaDropdownProps={{ searchable: false }} onVegaChange={(event: Event) => {
