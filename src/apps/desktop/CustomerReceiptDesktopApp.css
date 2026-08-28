@@ -349,10 +349,12 @@ body:has(.rbd-page) { background: #eef2f6; }
 
 .rbd-editor__buttons {
 	display: flex;
+	box-sizing: border-box;
 	width: 100%;
 	align-items: center;
 	justify-content: center;
 	gap: 16px;
+	padding: 0 24px 24px;
 }
 
 .rbd-editor__button {
