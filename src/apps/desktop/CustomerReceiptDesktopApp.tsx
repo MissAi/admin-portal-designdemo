@@ -1,5 +1,6 @@
 import { useEffect, useState, type FC } from 'react'
 import { VegaButton, VegaInput, VegaInputSelect, VegaModal, VegaTabGroup } from '@globalpayments/vega-react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import DiscardChangesIcon from '../../components/DiscardChangesIcon'
 import PageSaveButton from '../../components/PageSaveButton'
 import ResponsiveActionGroup from '../../components/ResponsiveActionGroup'
@@ -16,8 +17,8 @@ import { DesktopSideNavigation } from './DesktopSideNavigation'
 import './DesktopPage.css'
 import './CustomerReceiptDesktopApp.css'
 
-const LOCATIONS = ['All Locations', 'Ange - Mobile Save', 'Gioia Loc', 'Gioia Loc RN', 'Rebecca APv2', 'Rebecca Loc', 'Rebecca Loc RN']
-const SETTINGS_NAV = ['Settings', 'Online Ordering', 'App Ordering', 'Rooms', 'Custom Tender', 'Paid In & Out Types', 'Payout Apportions', 'Tip Out Types', 'Dayparts', 'Payment Gateway', 'Staff', 'Job Types', 'Labor Categories', 'Scheduled Shifts', 'Permissions', 'Report Access', 'Break Types', 'Time Punches', 'Clock In Messages', 'Authorized Devices', 'Payment Terminals', 'Printers', 'Display Formats', 'Customer Receipt']
+const LOCATIONS = ['All locations', 'Ange - Mobile Save', 'Gioia Loc', 'Gioia Loc RN', 'Rebecca APv2', 'Rebecca Loc', 'Rebecca Loc RN']
+const SETTINGS_NAV = ['Settings', 'Online Ordering', 'App Ordering', 'Dual Pricing', 'Rooms', 'Custom Tender', 'Paid In & Out Types', 'Payout Apportions', 'Tip Out Types', 'Dayparts', 'Payment Gateway', 'Staff', 'Job Types', 'Labor Categories', 'Scheduled Shifts', 'Permissions', 'Report Access', 'Break Types', 'Time Punches', 'Clock In Messages', 'Authorized Devices', 'Payment Terminals', 'Printers', 'Display Formats', 'Customer Receipt', 'Quickbooks']
 const RECEIPT_TABS = [
   { label: 'Display', dataTarget: 'receipt-display' },
   { label: 'Receipt Editor', dataTarget: 'receipt-editor' },
@@ -126,14 +127,25 @@ function ReceiptBodySample({ font, size, ...props }: ReturnType<typeof getReceip
 }
 
 const CustomerReceiptDesktopApp: FC = () => {
-  const [location, setLocation] = useState('Ange - Mobile Save')
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const requestedLocation = searchParams.get('location')
+  const [location, setLocation] = useState(requestedLocation && LOCATIONS.includes(requestedLocation) ? requestedLocation : 'Ange - Mobile Save')
   const [section, setSection] = useState('Customer Receipt')
   const [tab, setTab] = useState('receipt-display')
   const [settings, setSettings] = useState<Record<string, boolean>>({ ...DEFAULT_DISPLAY_SETTINGS })
   const [hasUnsavedReceiptChanges, setHasUnsavedReceiptChanges] = useState(false)
   const [pendingSection, setPendingSection] = useState<string | null>(null)
-  const chooseLocation = (nextLocation: string) => { setLocation(nextLocation); if (nextLocation !== 'All Locations') setSection('Settings') }
-  const isLocationSetup = location !== 'All Locations'
+  const chooseLocation = (nextLocation: string) => {
+    if (nextLocation === 'All locations') {
+      void navigate('/d/account-permissions')
+      return
+    }
+    setLocation(nextLocation)
+    setSection('Settings')
+    void navigate(`/d/customer-receipt?location=${encodeURIComponent(nextLocation)}`, { replace: true })
+  }
+  const isLocationSetup = location !== 'All locations'
   const showCustomerReceipt = section === 'Customer Receipt'
   const selectSection = (nextSection: string) => {
     if (nextSection === section) return
@@ -161,6 +173,7 @@ const CustomerReceiptDesktopApp: FC = () => {
         onLocationSelect: chooseLocation,
       }}
       currentFeatureName={section}
+      primaryNavigation={{ scope: 'location', activeItem: 'Location Setup' }}
       navigation={<DesktopSideNavigation items={SETTINGS_NAV} selectedItem={section} ariaLabel="Location setup sections" onSelect={selectSection} />}
     >
       {!showCustomerReceipt
@@ -195,7 +208,7 @@ const CustomerReceiptDesktopApp: FC = () => {
       locations={LOCATIONS}
       onLocationSelect={chooseLocation}
     />
-    <div className="rbd-start-message"><h1>Choose a location to begin</h1><p>Select <strong>All Locations</strong> in the global header, then choose <strong>Ange - Mobile Save</strong>.</p></div>
+    <div className="rbd-start-message"><h1>Choose a location to begin</h1><p>Select <strong>All locations</strong> in the global header, then choose <strong>Ange - Mobile Save</strong>.</p></div>
   </div>
 }
 

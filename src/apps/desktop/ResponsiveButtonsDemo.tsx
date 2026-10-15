@@ -463,6 +463,7 @@ const ResponsiveButtonsDemo: FC = () => {
         location: 'All Locations',
       }}
       currentFeatureName="Items"
+      primaryNavigation={{ scope: 'account', activeItem: 'Account Menu' }}
       navigation={
         <DesktopSideNavigation
           items={LEFT_NAV_ITEMS}
